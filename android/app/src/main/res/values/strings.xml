@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TNT</string>
+    <string name="tnt_widget_description">今天的时间轴：接下来几件事和时间</string>
+</resources>
