@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/palette.dart';
+import '../../domain/now_marker.dart';
 import '../../core/time_utils.dart';
 import '../../domain/layout/timeline_layout.dart';
 import '../../domain/models/tblock.dart';
@@ -15,12 +16,36 @@ class TimelinePainter extends CustomPainter {
     required this.scroll,
     required this.selectedId,
     required this.showTopInLane,
+    this.draggingId,
+    this.handleScale = 1.0,
+    this.nowMarkerStyle = NowMarkerStyle.pill,
+    this.nowMarkerIcon = 0,
+    this.nowMarkerDoodle = '',
+    this.nowColorIndex = 0,
+    this.nowLineColorIndex = 0,
+    this.nowMarkerSize = 1.0,
+    this.nowMarkerRight = false,
+    this.nowLineWidth = 1.6,
   });
 
   final TimelineLayout layout;
   final double scroll;
   final String? selectedId;
   final bool showTopInLane;
+
+  /// 正在被拖动/拉长的方块：稍微抬起一点，给手感反馈
+  final String? draggingId;
+
+  /// 上下把手的大小倍率（设置里的「手柄大小」）
+  final double handleScale;
+  final NowMarkerStyle nowMarkerStyle;
+  final int nowMarkerIcon;
+  final String nowMarkerDoodle;
+  final int nowColorIndex;
+  final int nowLineColorIndex;
+  final double nowMarkerSize;
+  final bool nowMarkerRight;
+  final double nowLineWidth;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -40,8 +65,9 @@ class TimelinePainter extends CustomPainter {
 
     _paintLanes(canvas, size);
     _paintGrid(canvas, size);
-    _paintNowLine(canvas, size);
     _paintBlocks(canvas, size);
+    // 现在时刻画在方块上面，否则被方块盖住就看不到标识了
+    _paintNowLine(canvas, size);
     _paintGutterDivider(canvas, size);
 
     canvas.restore();
@@ -55,7 +81,7 @@ class TimelinePainter extends CustomPainter {
     for (final rect in layout.laneRects) {
       final r = Rect.fromLTWH(rect.left, 0, rect.width, layout.contentHeight);
       canvas.drawRRect(
-        RRect.fromRectAndRadius(r, const Radius.circular(10)),
+        RRect.fromRectAndRadius(r, Radius.circular(10)),
         paint,
       );
     }
@@ -100,105 +126,276 @@ class TimelinePainter extends CustomPainter {
     final now = layout.now;
     final minute = now.hour * 60 + now.minute;
     final y = layout.yForMinute(minute);
+    final accent = nowColors[
+        nowColorIndex.clamp(0, nowColors.length - 1)];
+    final lineAccent = nowColors[
+        nowLineColorIndex.clamp(0, nowColors.length - 1)];
+    final scale = nowMarkerSize.clamp(0.7, 1.6);
+    final gx = TimelineLayout.gutterWidth;
+    // 标识可以放到时间轴左侧（默认）或右侧（压在泳道上）
+    final anchorX = nowMarkerRight ? gx + 8 : gx;
     final paint = Paint()
-      ..color = Palette.top
-      ..strokeWidth = 1.4;
+      ..color = lineAccent
+      ..strokeWidth = nowLineWidth.clamp(1.0, 4.0);
     canvas.drawLine(
-      Offset(TimelineLayout.gutterWidth, y),
+      Offset(gx, y),
       Offset(size.width, y),
       paint,
     );
     canvas.drawCircle(
-      Offset(TimelineLayout.gutterWidth, y),
-      3.5,
-      Paint()..color = Palette.top,
+      Offset(gx, y),
+      3.5 * scale,
+      Paint()..color = lineAccent,
     );
-    _drawBadge(
-      canvas,
-      formatMinute(minute),
-      Offset(TimelineLayout.gutterWidth + 6, y - 9),
-      bg: Palette.top,
-    );
+
+    final label = formatMinute(minute);
+    switch (nowMarkerStyle) {
+      case NowMarkerStyle.pill:
+        _drawBadge(
+          canvas,
+          label,
+          Offset(anchorX + 6, y - 9 * scale),
+          bg: accent,
+          scale: scale,
+        );
+      case NowMarkerStyle.arrow:
+        // 指向时间轴的三角 + 右侧时间
+        final tip = Offset(anchorX + 2, y);
+        final path = Path()
+          ..moveTo(tip.dx, tip.dy)
+          ..lineTo(tip.dx + 12 * scale, tip.dy - 7 * scale)
+          ..lineTo(tip.dx + 12 * scale, tip.dy + 7 * scale)
+          ..close();
+        canvas.drawPath(path, Paint()..color = accent);
+        _textMark(
+          canvas,
+          label,
+          Offset(tip.dx + 16 * scale, y - 17 * scale),
+          color: accent,
+          scale: scale,
+        );
+      case NowMarkerStyle.pointer:
+        // 一根细指针 + 一个小圆头
+        canvas.drawLine(
+          Offset(anchorX, y - 12 * scale),
+          Offset(anchorX, y),
+          Paint()
+            ..color = accent
+            ..strokeWidth = 1.6 * scale
+            ..strokeCap = StrokeCap.round,
+        );
+        canvas.drawCircle(
+          Offset(anchorX, y - 13 * scale),
+          4.2 * scale,
+          Paint()..color = accent,
+        );
+        _textMark(
+          canvas,
+          label,
+          Offset(anchorX + 8 * scale, y - 20 * scale),
+          color: accent,
+          scale: scale,
+        );
+      case NowMarkerStyle.icon:
+        final center = Offset(anchorX + 2, y - 2);
+        final radius = 10 * scale;
+        canvas.drawCircle(center, radius, Paint()..color = accent);
+        if (nowMarkerDoodle.trim().isNotEmpty) {
+          // 自己画的图案：画在圆里，留一点内边距
+          paintDoodle(
+            canvas,
+            Rect.fromCircle(center: center, radius: radius * 0.72),
+            nowMarkerDoodle,
+            Palette.bg,
+          );
+        } else {
+          final icon = nowMarkerIcons[
+              nowMarkerIcon.clamp(0, nowMarkerIcons.length - 1)];
+          final painter = TextPainter(
+            text: TextSpan(
+              text: String.fromCharCode(icon.codePoint),
+              style: TextStyle(
+                fontFamily: icon.fontFamily,
+                package: icon.fontPackage,
+                fontSize: 13 * scale,
+                color: Palette.bg,
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          painter.paint(
+            canvas,
+            center - Offset(painter.width / 2, painter.height / 2),
+          );
+        }
+        _textMark(
+          canvas,
+          label,
+          Offset(anchorX + 16 * scale, y - 20 * scale),
+          color: accent,
+          scale: scale,
+        );
+    }
+  }
+
+  void _textMark(
+    Canvas canvas,
+    String value,
+    Offset at, {
+    required Color color,
+    double scale = 1.0,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: value,
+        style: TextStyle(
+          fontSize: 10.5 * scale,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(canvas, at);
   }
 
   // ── 方块 ────────────────────────────────────────────────────
+  //
+  // 分两趟画：先把所有方块的底色铺完，再统一描边。
+  // 这样上层的半透明填充不会把下层的描边透出来（重叠处最容易「串线」）。
   void _paintBlocks(Canvas canvas, Size size) {
+    final drawables = <_BlockDraw>[];
     for (final placed in layout.placed) {
       final block = placed.block;
       final color = Palette.ofBlock(block, placed.isTop);
-      final rect = placed.rect;
+      final dragging = block.id == draggingId;
       final selected = block.id == selectedId;
+      final segments = placed.segments;
+      final split = segments != null && segments.length > 1;
+      var rects = (split ? segments : <Rect>[placed.rect]);
+      if (split) {
+        // 相邻两列之间留 0.75px 缝，避免两个方块的外框贴成一条「双线」；
+        // 上下各多盖 0.6px，让同一方块切成的时间片在合并时真正连成一片，
+        // 否则抗锯齿会在片与片之间留下一条浅色横线（看起来像「工」字）。
+        rects = [
+          for (final r in rects)
+            Rect.fromLTWH(r.left + 0.75, r.top - 0.6, r.width - 1.5, r.height + 1.2),
+        ];
+      }
+      final rect = dragging
+          ? placed.rect.inflate(1.5).translate(0, -1.5)
+          : placed.rect;
 
-      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(9));
+      // 最宽的一段用来放文字
+      var labelRect = rects.first;
+      for (final r in rects) {
+        if (r.width * r.height > labelRect.width * labelRect.height) labelRect = r;
+      }
 
-      // 底色
-      canvas.drawRRect(
-        rrect,
-        Paint()..color = color.withValues(alpha: block.done ? 0.08 : 0.20),
+      final fillColor = Color.alphaBlend(
+        color.withValues(alpha: block.done ? 0.10 : 0.24),
+        Palette.laneBg,
       );
+      drawables.add(_BlockDraw(
+        block: block,
+        color: color,
+        fillColor: fillColor,
+        rects: rects,
+        rect: rect,
+        labelRect: labelRect,
+        isTop: placed.isTop,
+        selected: selected,
+        dragging: dragging,
+      ));
+    }
 
-      // 左侧色条
-      final barWidth = rect.width < 24 ? 3.0 : 4.0;
+    for (final d in drawables) {
+      if (d.dragging) {
+        for (final r in d.rects) {
+          canvas.drawShadow(
+            Path()..addRRect(RRect.fromRectAndRadius(r, Radius.circular(9))),
+            Color(0xCC000000),
+            10,
+            false,
+          );
+        }
+      }
+      var fill = Path()..addRect(d.rects.first);
+      for (final r in d.rects.skip(1)) {
+        fill = Path.combine(PathOperation.union, fill, Path()..addRect(r));
+      }
+      canvas.drawPath(fill, Paint()..color = d.fillColor);
+
+      final first = d.rects.first;
+      final barWidth = first.width < 24 ? 3.0 : 4.0;
       canvas.drawRRect(
         RRect.fromRectAndCorners(
-          Rect.fromLTWH(rect.left, rect.top, barWidth, rect.height),
-          topLeft: const Radius.circular(9),
-          bottomLeft: const Radius.circular(9),
+          Rect.fromLTWH(first.left, first.top, barWidth, first.height),
+          topLeft: Radius.circular(3),
+          bottomLeft: Radius.circular(3),
         ),
-        Paint()..color = color,
+        Paint()..color = d.color,
       );
+    }
 
-      // 描边：置顶红框 / 普通淡边 / 选中白框
-      final border = Paint()..style = PaintingStyle.stroke;
-      if (selected) {
-        border
-          ..color = Colors.white
-          ..strokeWidth = 2;
-      } else if (placed.isTop) {
-        border
-          ..color = Palette.top
-          ..strokeWidth = 1.6;
-      } else {
-        border
-          ..color = color.withValues(alpha: 0.45)
-          ..strokeWidth = 1;
+    // 第二趟：每个方块描「外圈」轮廓（多段先合成一个 Path，所以不会有内部横线）
+    for (final d in drawables) {
+      final borderColor = d.selected
+          ? Colors.white
+          : (d.isTop ? Palette.top : d.color.withValues(alpha: 0.55));
+      final borderWidth = d.selected ? 2.0 : (d.isTop ? 1.6 : 1.0);
+      var outline = Path()..addRect(d.rects.first);
+      for (final r in d.rects.skip(1)) {
+        outline = Path.combine(PathOperation.union, outline, Path()..addRect(r));
       }
-      canvas.drawRRect(rrect, border);
+      canvas.drawPath(
+        outline,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..color = borderColor
+          ..strokeWidth = borderWidth
+          ..strokeJoin = StrokeJoin.round,
+      );
+    }
 
-      // 文字
-      if (rect.width >= 34 && rect.height >= 16) {
+    // 第三趟：文字（所有方块都画，不再依赖选中）+ 选中方块的把手
+    for (final d in drawables) {
+      final labelRect = d.labelRect;
+      if (labelRect.width >= 34 && labelRect.height >= 16) {
+        final rrect = RRect.fromRectAndRadius(labelRect, Radius.circular(6));
         canvas.save();
         canvas.clipRRect(rrect);
-        final textLeft = rect.left + barWidth + 6;
-        final textWidth = math.max(0.0, rect.right - textLeft - 6);
-        final titleSize = rect.width < 80 ? 11.0 : 12.5;
+        final barWidth = labelRect.width < 24 ? 3.0 : 4.0;
+        final textLeft = labelRect.left + barWidth + 6;
+        final textWidth = math.max(0.0, labelRect.right - textLeft - 6);
+        final titleSize = labelRect.width < 80 ? 11.0 : 12.5;
         _drawText(
           canvas,
-          block.title,
-          Offset(textLeft, rect.top + 4),
+          d.block.title,
+          Offset(textLeft, labelRect.top + 4),
           size: titleSize,
           color: Palette.textPrimary,
           weight: FontWeight.w600,
           maxWidth: textWidth,
-          maxLines: rect.height < 34 ? 1 : 2,
+          maxLines: labelRect.height < 34 ? 1 : 2,
         );
-        if (rect.height >= 40 && textWidth > 60) {
+        if (labelRect.height >= 40 && textWidth > 60) {
           _drawText(
             canvas,
-            formatRange(block.startMin, block.durationMin),
-            Offset(textLeft, rect.top + (rect.height < 56 ? 20 : 22)),
+            formatRange(d.block.startMin, d.block.durationMin),
+            Offset(textLeft, labelRect.top + (labelRect.height < 56 ? 20 : 22)),
             size: 10,
             color: Palette.textSecondary,
             maxWidth: textWidth,
           );
         }
-        if (rect.height >= 62 && placed.isTop && textWidth > 60) {
-          final left = deadlineLabel(block, layout.now);
+        if (labelRect.height >= 62 && d.isTop && textWidth > 60) {
+          final left = deadlineLabel(d.block, layout.now);
           if (left.isNotEmpty) {
             _drawText(
               canvas,
-              '死线$left',
-              Offset(textLeft, rect.bottom - 16),
+              '死线剩 $left',
+              Offset(textLeft, labelRect.bottom - 16),
               size: 10,
               color: Palette.top,
               weight: FontWeight.w600,
@@ -209,19 +406,53 @@ class TimelinePainter extends CustomPainter {
         canvas.restore();
       }
 
-      // 底部改时长把手（选中时显示）
-      if (selected && rect.height > 30) {
-        final handleY = rect.bottom - 4;
-        canvas.drawLine(
-          Offset(rect.left + 8, handleY),
-          Offset(rect.right - 8, handleY),
-          Paint()
-            ..color = Colors.white.withValues(alpha: 0.5)
-            ..strokeWidth = 2
-            ..strokeCap = StrokeCap.round,
-        );
+      if (d.selected) {
+        final cx = d.rect.center.dx;
+        _paintHandleGrip(canvas, Offset(cx, d.rect.top - 7), true);
+        _paintHandleGrip(canvas, Offset(cx, d.rect.bottom + 7), false);
       }
     }
+  }
+
+  /// 选中方块外侧的小箭头把手（上＝改开始时间，下＝改时长）
+  void _paintHandleGrip(Canvas canvas, Offset center, bool pointingUp) {
+    final w = 28 * handleScale;
+    final h = 14 * handleScale;
+    final pill = Rect.fromCenter(center: center, width: w, height: h);
+    final rrect = RRect.fromRectAndRadius(pill, Radius.circular(h / 2));
+    canvas.drawRRect(rrect, Paint()..color = Palette.surfaceHigh);
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = Palette.accent.withValues(alpha: 0.85),
+    );
+    final path = Path();
+    final cx = center.dx;
+    final cy = center.dy;
+    final dx = 4 * handleScale;
+    final dy = 2.5 * handleScale;
+    if (pointingUp) {
+      path
+        ..moveTo(cx - dx, cy + dy * 0.8)
+        ..lineTo(cx, cy - dy)
+        ..lineTo(cx + dx, cy + dy * 0.8);
+    } else {
+      path
+        ..moveTo(cx - dx, cy - dy * 0.8)
+        ..lineTo(cx, cy + dy)
+        ..lineTo(cx + dx, cy - dy * 0.8);
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..color = Palette.accent,
+    );
   }
 
   void _paintGutterDivider(Canvas canvas, Size size) {
@@ -248,14 +479,14 @@ class TimelinePainter extends CustomPainter {
     }
 
     for (var i = 0; i < layout.laneRects.length; i++) {
-      final lane = Lane.byIndex(i);
+      final lane = layout.lanes[i];
       final rect = layout.laneRects[i];
       final count = counts[lane] ?? 0;
-      final label = count > 0 ? '${lane.label} · $count' : lane.label;
+      final label = count > 0 ? '${lane.name} · $count' : lane.name;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTWH(rect.left, 0, rect.width, h - 6),
-          const Radius.circular(10),
+          Radius.circular(10),
         ),
         Paint()..color = Palette.surface,
       );
@@ -288,7 +519,7 @@ class TimelinePainter extends CustomPainter {
     String text,
     Offset at, {
     double size = 12,
-    Color color = Palette.textPrimary,
+    Color? color,
     FontWeight weight = FontWeight.w500,
     double maxWidth = double.infinity,
     int maxLines = 1,
@@ -319,13 +550,19 @@ class TimelinePainter extends CustomPainter {
     painter.paint(canvas, Offset(dx, at.dy));
   }
 
-  void _drawBadge(Canvas canvas, String text, Offset at, {required Color bg}) {
+  void _drawBadge(
+    Canvas canvas,
+    String text,
+    Offset at, {
+    required Color bg,
+    double scale = 1.0,
+  }) {
     final painter = TextPainter(
       text: TextSpan(
         text: text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 10,
+          fontSize: 10 * scale,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -334,16 +571,41 @@ class TimelinePainter extends CustomPainter {
     final rect = Rect.fromLTWH(
       at.dx,
       at.dy,
-      painter.width + 10,
-      painter.height + 4,
+      painter.width + 10 * scale,
+      painter.height + 4 * scale,
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(4)),
+      RRect.fromRectAndRadius(rect, Radius.circular(4 * scale)),
       Paint()..color = bg,
     );
-    painter.paint(canvas, Offset(at.dx + 5, at.dy + 2));
+    painter.paint(canvas, Offset(at.dx + 5 * scale, at.dy + 2 * scale));
   }
 
   @override
   bool shouldRepaint(covariant TimelinePainter oldDelegate) => true;
+}
+
+/// 一趟绘制需要的中间数据
+class _BlockDraw {
+  _BlockDraw({
+    required this.block,
+    required this.color,
+    required this.fillColor,
+    required this.rects,
+    required this.rect,
+    required this.labelRect,
+    required this.isTop,
+    required this.selected,
+    required this.dragging,
+  });
+
+  final TBlock block;
+  final Color color;
+  final Color fillColor;
+  final List<Rect> rects;
+  final Rect rect;
+  final Rect labelRect;
+  final bool isTop;
+  final bool selected;
+  final bool dragging;
 }

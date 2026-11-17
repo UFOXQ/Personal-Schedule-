@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="280dp"
+    android:minHeight="80dp"
+    android:minResizeWidth="280dp"
+    android:minResizeHeight="80dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/tnt_strip_widget"
+    android:previewLayout="@layout/tnt_strip_widget"
+    android:widgetCategory="home_screen"
+    android:description="@string/tnt_strip_widget_description" />

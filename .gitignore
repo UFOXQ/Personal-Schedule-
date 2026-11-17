@@ -49,3 +49,13 @@ app.*.map.json
 
 # dev-loop scratch (tool/dev.ps1 points TMP/TEMP here)
 .tmp/
+# 正式签名配置（不要提交）
+android/key.properties
+*.jks
+*.keystore
+# 构建产物
+dist/
+# Android 构建产物（Gradle 也会在 android/ 下写 build/）
+android/build/
+android/.gradle/
+windows/flutter/ephemeral/

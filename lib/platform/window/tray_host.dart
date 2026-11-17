@@ -10,6 +10,8 @@ import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:tray_manager/legacy.dart';
 import 'package:window_manager/legacy.dart';
 
+import '../../core/app_log.dart';
+
 /// 桌面端「常驻托盘」的宿主。
 ///
 /// 两个行为：
@@ -48,9 +50,11 @@ class TrayHost with TrayListener, WindowListener {
         ),
       );
       trayManager.addListener(this);
+      await appLog('托盘已就位（图标在任务栏溢出区里，点 ^ 可见）');
     } catch (error) {
-      // 托盘失败不影响主功能，只在日志里留痕
-      debugPrint('TNT: 托盘初始化失败 -> $error');
+      // 托盘失败不影响主功能，但要落盘留痕：
+      // 低完整性（沙箱）或权限受限时会走到这里。
+      await appLog('托盘初始化失败 -> $error');
     }
   }
 

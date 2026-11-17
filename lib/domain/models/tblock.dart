@@ -1,26 +1,9 @@
 /// 领域模型：一天的方块。纯 Dart，不依赖 Flutter，方便单测。
 library;
 
-/// 三条泳道。方块**永远**属于其中一条，置顶只是投影，不改归属。
-enum Lane {
-  /// ① 日常琐事：喂猫、洗衣、做饭
-  daily,
+import 'lane.dart';
 
-  /// ② 长期任务打卡：学英语、健身
-  habit,
-
-  /// ③ 临时：平时没有，出现了 A 级或临近死线的 B 级才进来
-  temp;
-
-  String get label => switch (this) {
-    Lane.daily => '日常',
-    Lane.habit => '打卡',
-    Lane.temp => '临时',
-  };
-
-  static Lane byIndex(int index) =>
-      Lane.values[index.clamp(0, Lane.values.length - 1)];
-}
+export 'lane.dart';
 
 /// 用户手动设定的分类，不是最终优先级
 enum Priority {
@@ -45,6 +28,9 @@ enum Priority {
 
   /// A -> B -> C -> D -> A
   Priority get next => Priority.values[(index + 1) % Priority.values.length];
+
+  static Priority byIndex(int index) =>
+      Priority.values[index.clamp(0, Priority.values.length - 1)];
 }
 
 /// 方块从哪来
@@ -195,7 +181,7 @@ class TBlock {
   }
 
   @override
-  String toString() => 'TBlock($title, ${lane.label}, $startMin+$durationMin)';
+  String toString() => 'TBlock($title, ${lane.name}, $startMin+$durationMin)';
 }
 
 const Object _sentinel = Object();

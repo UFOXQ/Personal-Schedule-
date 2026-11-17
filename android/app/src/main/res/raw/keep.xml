@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  release 构建会开资源压缩（shrinkResources），而通知小图标是按名字
+  "ic_stat_tnt" 传给 flutter_local_notifications 的，静态分析看不到引用，
+  会被当成无用资源删掉 —— 结果就是 release 包里 zonedSchedule 抛
+  `invalid_icon`，到点提醒全哑。用 tools:keep 把它钉住。
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_tnt" />

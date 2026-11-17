@@ -1,7 +1,7 @@
 name: tnt_app
 description: "TNT —— 一天时间轴上的方块事件管理（Android + Windows）"
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+30
 
 environment:
   sdk: ^3.14.0

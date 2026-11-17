@@ -1,5 +1,8 @@
 allprojects {
     repositories {
+        // 国内镜像优先：本机到 dl.google.com 常握手超时；镜像缺的包仍会回落到 google()。
+        maven("https://maven.aliyun.com/repository/google")
+        maven("https://maven.aliyun.com/repository/public")
         google()
         mavenCentral()
     }

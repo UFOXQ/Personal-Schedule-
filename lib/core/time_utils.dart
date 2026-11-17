@@ -40,3 +40,15 @@ String formatDuration(int minutes) {
 /// 判断两个时间段是否重叠（端点相接不算重叠）
 bool rangesOverlap(int aStart, int aEnd, int bStart, int bEnd) =>
     aStart < bEnd && bStart < aEnd;
+/// 把开始时间夹到「当天还放得下 durationMin」的范围内。
+int clampStartMinute(int startMin, int durationMin) =>
+    startMin.clamp(0, (kMinutesPerDay - durationMin).clamp(0, kMinutesPerDay));
+
+/// 把时长夹到当天剩余时间之内（至少 kMinDuration）。
+int clampDuration(int startMin, int durationMin) {
+  final maxDur = (kMinutesPerDay - startMin).clamp(
+    kMinDuration,
+    kMinutesPerDay,
+  );
+  return durationMin.clamp(kMinDuration, maxDur);
+}

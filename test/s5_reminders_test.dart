@@ -160,6 +160,8 @@ void main() {
       expect(reminders.single.title, '交周报');
       expect(reminders.single.body, contains('日常'));
       expect(reminders.single.body, contains('09:20'));
+      // 文案里的时段必须用「时长」算结束（用 endMin 当参数会算出 09:20 - 10:20 以外的怪时间）
+      expect(reminders.single.body, contains('09:20 - 09:50'));
 
       final custom = planReminders(
         blocks: [block(id: 'x', title: '交周报', startMin: 560)],

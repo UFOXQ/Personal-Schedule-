@@ -64,19 +64,25 @@ class LibraryRepository {
   }
 
   /// 新建一个集合（整包），返回集合 id
+  ///
+  /// [id] / [itemIdPrefix] 是给示例数据用的：两台设备各自首次启动时
+  /// 会灌同一批示例，只有 id 完全一样，局域网同步才会按 LWW 合并成一份，
+  /// 而不是各留一套出现「洗衣服 ×2」。
   Future<String> createCollection({
     required String name,
     List<CollectionItemsCompanion> items = const [],
     int? color,
+    String? id,
+    String? itemIdPrefix,
   }) async {
     final now = DateTime.now();
-    final id = _uuid.v4();
+    final collectionId = id ?? _uuid.v4();
     await _db.transaction(() async {
       await _db
           .into(_db.collections)
           .insert(
             CollectionsCompanion.insert(
-              id: id,
+              id: collectionId,
               name: name,
               color: Value(color),
               createdAt: now,
@@ -84,12 +90,17 @@ class LibraryRepository {
             ),
           );
       await _db.batch((batch) {
+        var index = 0;
         for (final item in items) {
           batch.insert(
             _db.collectionItems,
             item.copyWith(
-              id: Value(_uuid.v4()),
-              collectionId: Value(id),
+              id: Value(
+                itemIdPrefix == null
+                    ? _uuid.v4()
+                    : '$itemIdPrefix-${index++}',
+              ),
+              collectionId: Value(collectionId),
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
@@ -97,7 +108,7 @@ class LibraryRepository {
         }
       });
     });
-    return id;
+    return collectionId;
   }
 
   /// 建集合的简易入口：直接给条目，内部补齐 id / 时间戳 / 排序。
@@ -105,17 +116,21 @@ class LibraryRepository {
     required String name,
     required List<CollectionSeedItem> items,
     int? color,
+    String? id,
+    String? itemIdPrefix,
   }) {
     return createCollection(
       name: name,
       color: color,
+      id: id,
+      itemIdPrefix: itemIdPrefix,
       items: [
         for (var i = 0; i < items.length; i++)
           CollectionItemsCompanion.insert(
             id: '',
             collectionId: '',
             title: items[i].title,
-            lane: items[i].lane.index,
+            lane: items[i].lane.id,
             startMin: items[i].startMin,
             durationMin: items[i].durationMin,
             priority: Value(items[i].priority.index),
@@ -132,6 +147,60 @@ class LibraryRepository {
     return (_db.update(_db.collections)..where((t) => t.id.equals(id))).write(
       CollectionsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );
+  }
+
+  /// 改一个集合：改名字 + 整包替换条目。
+  ///
+  /// 条目没有墓碑字段，所以这里是硬删再插——集合本身是「模板」，
+  /// 改一次就等于换一份，不同步删除是可接受的取舍（README 里有记）。
+  Future<void> updateCollection({
+    required String id,
+    required String name,
+    required List<CollectionSeedItem> items,
+  }) async {
+    final now = DateTime.now();
+    await _db.transaction(() async {
+      await (_db.update(_db.collections)..where((t) => t.id.equals(id))).write(
+        CollectionsCompanion(name: Value(name), updatedAt: Value(now)),
+      );
+      await (_db.delete(
+        _db.collectionItems,
+      )..where((t) => t.collectionId.equals(id))).go();
+      await _db.batch((batch) {
+        for (var i = 0; i < items.length; i++) {
+          batch.insert(
+            _db.collectionItems,
+            CollectionItemsCompanion.insert(
+              id: _uuid.v4(),
+              collectionId: id,
+              title: items[i].title,
+              lane: items[i].lane.id,
+              startMin: items[i].startMin,
+              durationMin: items[i].durationMin,
+              priority: Value(items[i].priority.index),
+              sortOrder: Value(i),
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+        }
+      });
+    });
+  }
+
+  /// 某集合的条目按「条目模型」返回，方便编辑面板回填
+  Future<List<CollectionSeedItem>> collectionSeeds(String collectionId) async {
+    final rows = await collectionItems(collectionId);
+    return [
+      for (final row in rows)
+        CollectionSeedItem(
+          title: row.title,
+          lane: Lane(id: row.lane, name: row.lane),
+          startMin: row.startMin,
+          durationMin: row.durationMin,
+          priority: Priority.byIndex(row.priority),
+        ),
+    ];
   }
 
   // ── 长期计划 ────────────────────────────────────────────────
@@ -178,7 +247,7 @@ class LibraryRepository {
         title: title,
         startDate: startDate,
         endDate: endDate,
-        lane: lane.index,
+        lane: lane.id,
         startMin: startMin,
         durationMin: durationMin,
         priority: Value(priority.index),
@@ -213,7 +282,7 @@ class LibraryRepository {
         title: Value(title),
         startDate: Value(startDate),
         endDate: Value(endDate),
-        lane: Value(lane.index),
+        lane: Value(lane.id),
         startMin: Value(startMin),
         durationMin: Value(durationMin),
         priority: Value(priority.index),
@@ -228,7 +297,7 @@ class LibraryRepository {
     required String dayBlockId,
     required String date,
     required String title,
-    required int lane,
+    required String lane,
     required int startMin,
     required int durationMin,
     String? note,
@@ -257,6 +326,19 @@ class LibraryRepository {
       ])
       ..limit(limit);
     return q.get();
+  }
+
+  /// 哪些天有过完成记录（用于连续打卡天数）。
+  Future<Set<String>> completionDayKeys() async {
+    final q = _db.selectOnly(_db.completionLogs)
+      ..addColumns([_db.completionLogs.date])
+      ..groupBy([_db.completionLogs.date]);
+    final rows = await q.get();
+    return {
+      for (final row in rows)
+        if (row.read(_db.completionLogs.date) != null)
+          row.read(_db.completionLogs.date)!,
+    };
   }
 }
 

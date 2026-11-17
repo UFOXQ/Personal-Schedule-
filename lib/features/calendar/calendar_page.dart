@@ -2,13 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/palette.dart';
+import '../../domain/models/day_jump.dart';
 import '../../core/time_utils.dart';
 import '../../data/providers.dart';
 import '../../data/repositories/library_repository.dart';
 import '../../domain/calendar/day_overview.dart';
 import '../../domain/calendar/month_grid.dart';
 import '../../domain/models/tblock.dart';
-import '../plans/plans_page.dart';
+import '../library/library_page.dart';
+import '../week/week_page.dart';
 
 /// 月视图每个日期上的方块数
 final monthCountsProvider = FutureProvider.autoDispose
@@ -54,12 +56,30 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   }
 
   void _openDay(String key) {
-    Navigator.of(context).pop(key);
+    Navigator.of(context).pop<DayJump>((date: key, minute: null));
+  }
+
+  Future<void> _openWeek() async {
+    final entry = _calendarEntryDate;
+    final jump = await Navigator.of(context).push<DayJump>(
+      MaterialPageRoute<DayJump>(
+        builder: (_) => WeekPage(initialDate: entry),
+      ),
+    );
+    if (!mounted || jump == null) return;
+    Navigator.of(context).pop<DayJump>(jump);
+    ref.invalidate(monthCountsProvider);
+    ref.invalidate(dayOverviewProvider);
+  }
+
+  /// 周视图从「当前选中的那天」打开，否则从今天。
+  DateTime get _calendarEntryDate {
+    return DateTime.tryParse(_selectedKey) ?? DateTime.now();
   }
 
   Future<void> _openPlans() async {
     await Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (_) => const PlansPage()));
+        .push(MaterialPageRoute<void>(builder: (_) => const LibraryPage(initialTab: 1)));
     ref.invalidate(monthCountsProvider);
     ref.invalidate(dayOverviewProvider);
   }
@@ -75,6 +95,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         backgroundColor: Palette.bg,
         title: const Text('日历', style: TextStyle(fontSize: 16)),
         actions: [
+          IconButton(
+            tooltip: '周视图',
+            onPressed: _openWeek,
+            icon: const Icon(Icons.view_week_outlined, size: 20),
+          ),
           IconButton(
             tooltip: '长期计划',
             onPressed: _openPlans,
@@ -110,7 +135,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                 error: (error, _) => Center(
                   child: Text(
                     '读不到数据：$error',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textDim,
                       fontSize: 12,
                     ),
@@ -162,7 +187,7 @@ class _MonthHeader extends StatelessWidget {
           ),
           Text(
             monthLabel(month),
-            style: const TextStyle(
+            style: TextStyle(
               color: Palette.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w600,
@@ -193,7 +218,7 @@ class _WeekdayRow extends StatelessWidget {
               child: Center(
                 child: Text(
                   label,
-                  style: const TextStyle(color: Palette.textDim, fontSize: 11),
+                  style: TextStyle(color: Palette.textDim, fontSize: 11),
                 ),
               ),
             ),
@@ -239,7 +264,8 @@ class _MonthGrid extends StatelessWidget {
           isToday: key == todayKey,
           isSelected: key == selectedKey,
           onTap: () => onSelect(key),
-          onDoubleTap: () => Navigator.of(context).pop(key),
+          onDoubleTap: () =>
+              Navigator.of(context).pop<DayJump>((date: key, minute: null)),
         );
       },
     );
@@ -314,7 +340,7 @@ class _DayCell extends StatelessWidget {
             if (count > 0)
               Text(
                 '$count',
-                style: const TextStyle(color: Palette.textDim, fontSize: 9),
+                style: TextStyle(color: Palette.textDim, fontSize: 9),
               )
             else
               const SizedBox(height: 11),
@@ -337,7 +363,7 @@ class _DayPreview extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Palette.surface,
         border: Border(top: BorderSide(color: Palette.line)),
       ),
@@ -345,7 +371,7 @@ class _DayPreview extends ConsumerWidget {
         loading: () => const SizedBox(height: 92),
         error: (error, _) => Text(
           '$error',
-          style: const TextStyle(color: Palette.textDim, fontSize: 12),
+          style: TextStyle(color: Palette.textDim, fontSize: 12),
         ),
         data: (data) {
           final day = DateTime.parse(dateKey);
@@ -356,7 +382,7 @@ class _DayPreview extends ConsumerWidget {
                 children: [
                   Text(
                     dayLabel(day),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -364,14 +390,14 @@ class _DayPreview extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   if (data.isEmpty)
-                    const Text(
+                    Text(
                       '空着',
                       style: TextStyle(color: Palette.textDim, fontSize: 11),
                     ),
                   const Spacer(),
                   Text(
                     '${data.blocks.length} 件 · ${formatDuration(data.totalMinutes)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textSecondary,
                       fontSize: 11,
                     ),
@@ -382,7 +408,7 @@ class _DayPreview extends ConsumerWidget {
               SizedBox(
                 height: 44,
                 child: data.isEmpty
-                    ? const Align(
+                    ? Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '这天还没有安排',
@@ -443,11 +469,11 @@ class _MiniBlock extends StatelessWidget {
         children: [
           Text(
             formatMinute(block.startMin),
-            style: const TextStyle(color: Palette.textSecondary, fontSize: 9),
+            style: TextStyle(color: Palette.textSecondary, fontSize: 9),
           ),
           Text(
             block.title,
-            style: const TextStyle(color: Palette.textPrimary, fontSize: 11),
+            style: TextStyle(color: Palette.textPrimary, fontSize: 11),
           ),
         ],
       ),

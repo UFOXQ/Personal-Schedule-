@@ -3,6 +3,412 @@
 part of 'tnt_database.dart';
 
 // ignore_for_file: type=lint
+class $LaneRowsTable extends LaneRows with TableInfo<$LaneRowsTable, LaneRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LaneRowsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    sortOrder,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lane_rows';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LaneRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LaneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LaneRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $LaneRowsTable createAlias(String alias) {
+    return $LaneRowsTable(attachedDatabase, alias);
+  }
+}
+
+class LaneRow extends DataClass implements Insertable<LaneRow> {
+  final String id;
+  final String name;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const LaneRow({
+    required this.id,
+    required this.name,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  LaneRowsCompanion toCompanion(bool nullToAbsent) {
+    return LaneRowsCompanion(
+      id: Value(id),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory LaneRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LaneRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  LaneRow copyWith({
+    String? id,
+    String? name,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => LaneRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  LaneRow copyWithCompanion(LaneRowsCompanion data) {
+    return LaneRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LaneRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, sortOrder, createdAt, updatedAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LaneRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class LaneRowsCompanion extends UpdateCompanion<LaneRow> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const LaneRowsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LaneRowsCompanion.insert({
+    required String id,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LaneRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LaneRowsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return LaneRowsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LaneRowsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $BlockTemplatesTable extends BlockTemplates
     with TableInfo<$BlockTemplatesTable, BlockTemplate> {
   @override
@@ -29,11 +435,11 @@ class $BlockTemplatesTable extends BlockTemplates
   );
   static const VerificationMeta _laneMeta = const VerificationMeta('lane');
   @override
-  late final GeneratedColumn<int> lane = GeneratedColumn<int>(
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
     'lane',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _priorityMeta = const VerificationMeta(
@@ -244,7 +650,7 @@ class $BlockTemplatesTable extends BlockTemplates
         data['${effectivePrefix}title'],
       )!,
       lane: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}lane'],
       )!,
       priority: attachedDatabase.typeMapping.read(
@@ -291,7 +697,7 @@ class $BlockTemplatesTable extends BlockTemplates
 class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
   final String id;
   final String title;
-  final int lane;
+  final String lane;
   final int priority;
   final int durationMin;
   final int? startMin;
@@ -318,7 +724,7 @@ class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
-    map['lane'] = Variable<int>(lane);
+    map['lane'] = Variable<String>(lane);
     map['priority'] = Variable<int>(priority);
     map['duration_min'] = Variable<int>(durationMin);
     if (!nullToAbsent || startMin != null) {
@@ -368,7 +774,7 @@ class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
     return BlockTemplate(
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
-      lane: serializer.fromJson<int>(json['lane']),
+      lane: serializer.fromJson<String>(json['lane']),
       priority: serializer.fromJson<int>(json['priority']),
       durationMin: serializer.fromJson<int>(json['durationMin']),
       startMin: serializer.fromJson<int?>(json['startMin']),
@@ -385,7 +791,7 @@ class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
-      'lane': serializer.toJson<int>(lane),
+      'lane': serializer.toJson<String>(lane),
       'priority': serializer.toJson<int>(priority),
       'durationMin': serializer.toJson<int>(durationMin),
       'startMin': serializer.toJson<int?>(startMin),
@@ -400,7 +806,7 @@ class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
   BlockTemplate copyWith({
     String? id,
     String? title,
-    int? lane,
+    String? lane,
     int? priority,
     int? durationMin,
     Value<int?> startMin = const Value.absent(),
@@ -494,7 +900,7 @@ class BlockTemplate extends DataClass implements Insertable<BlockTemplate> {
 class BlockTemplatesCompanion extends UpdateCompanion<BlockTemplate> {
   final Value<String> id;
   final Value<String> title;
-  final Value<int> lane;
+  final Value<String> lane;
   final Value<int> priority;
   final Value<int> durationMin;
   final Value<int?> startMin;
@@ -521,7 +927,7 @@ class BlockTemplatesCompanion extends UpdateCompanion<BlockTemplate> {
   BlockTemplatesCompanion.insert({
     required String id,
     required String title,
-    required int lane,
+    required String lane,
     this.priority = const Value.absent(),
     this.durationMin = const Value.absent(),
     this.startMin = const Value.absent(),
@@ -539,7 +945,7 @@ class BlockTemplatesCompanion extends UpdateCompanion<BlockTemplate> {
   static Insertable<BlockTemplate> custom({
     Expression<String>? id,
     Expression<String>? title,
-    Expression<int>? lane,
+    Expression<String>? lane,
     Expression<int>? priority,
     Expression<int>? durationMin,
     Expression<int>? startMin,
@@ -569,7 +975,7 @@ class BlockTemplatesCompanion extends UpdateCompanion<BlockTemplate> {
   BlockTemplatesCompanion copyWith({
     Value<String>? id,
     Value<String>? title,
-    Value<int>? lane,
+    Value<String>? lane,
     Value<int>? priority,
     Value<int>? durationMin,
     Value<int?>? startMin,
@@ -606,7 +1012,7 @@ class BlockTemplatesCompanion extends UpdateCompanion<BlockTemplate> {
       map['title'] = Variable<String>(title.value);
     }
     if (lane.present) {
-      map['lane'] = Variable<int>(lane.value);
+      map['lane'] = Variable<String>(lane.value);
     }
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
@@ -1161,11 +1567,11 @@ class $CollectionItemsTable extends CollectionItems
   );
   static const VerificationMeta _laneMeta = const VerificationMeta('lane');
   @override
-  late final GeneratedColumn<int> lane = GeneratedColumn<int>(
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
     'lane',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _startMinMeta = const VerificationMeta(
@@ -1373,7 +1779,7 @@ class $CollectionItemsTable extends CollectionItems
         data['${effectivePrefix}title'],
       )!,
       lane: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}lane'],
       )!,
       startMin: attachedDatabase.typeMapping.read(
@@ -1414,7 +1820,7 @@ class CollectionItem extends DataClass implements Insertable<CollectionItem> {
   final String collectionId;
   final String? templateId;
   final String title;
-  final int lane;
+  final String lane;
   final int startMin;
   final int durationMin;
   final int priority;
@@ -1443,7 +1849,7 @@ class CollectionItem extends DataClass implements Insertable<CollectionItem> {
       map['template_id'] = Variable<String>(templateId);
     }
     map['title'] = Variable<String>(title);
-    map['lane'] = Variable<int>(lane);
+    map['lane'] = Variable<String>(lane);
     map['start_min'] = Variable<int>(startMin);
     map['duration_min'] = Variable<int>(durationMin);
     map['priority'] = Variable<int>(priority);
@@ -1481,7 +1887,7 @@ class CollectionItem extends DataClass implements Insertable<CollectionItem> {
       collectionId: serializer.fromJson<String>(json['collectionId']),
       templateId: serializer.fromJson<String?>(json['templateId']),
       title: serializer.fromJson<String>(json['title']),
-      lane: serializer.fromJson<int>(json['lane']),
+      lane: serializer.fromJson<String>(json['lane']),
       startMin: serializer.fromJson<int>(json['startMin']),
       durationMin: serializer.fromJson<int>(json['durationMin']),
       priority: serializer.fromJson<int>(json['priority']),
@@ -1498,7 +1904,7 @@ class CollectionItem extends DataClass implements Insertable<CollectionItem> {
       'collectionId': serializer.toJson<String>(collectionId),
       'templateId': serializer.toJson<String?>(templateId),
       'title': serializer.toJson<String>(title),
-      'lane': serializer.toJson<int>(lane),
+      'lane': serializer.toJson<String>(lane),
       'startMin': serializer.toJson<int>(startMin),
       'durationMin': serializer.toJson<int>(durationMin),
       'priority': serializer.toJson<int>(priority),
@@ -1513,7 +1919,7 @@ class CollectionItem extends DataClass implements Insertable<CollectionItem> {
     String? collectionId,
     Value<String?> templateId = const Value.absent(),
     String? title,
-    int? lane,
+    String? lane,
     int? startMin,
     int? durationMin,
     int? priority,
@@ -1609,7 +2015,7 @@ class CollectionItemsCompanion extends UpdateCompanion<CollectionItem> {
   final Value<String> collectionId;
   final Value<String?> templateId;
   final Value<String> title;
-  final Value<int> lane;
+  final Value<String> lane;
   final Value<int> startMin;
   final Value<int> durationMin;
   final Value<int> priority;
@@ -1636,7 +2042,7 @@ class CollectionItemsCompanion extends UpdateCompanion<CollectionItem> {
     required String collectionId,
     this.templateId = const Value.absent(),
     required String title,
-    required int lane,
+    required String lane,
     required int startMin,
     required int durationMin,
     this.priority = const Value.absent(),
@@ -1657,7 +2063,7 @@ class CollectionItemsCompanion extends UpdateCompanion<CollectionItem> {
     Expression<String>? collectionId,
     Expression<String>? templateId,
     Expression<String>? title,
-    Expression<int>? lane,
+    Expression<String>? lane,
     Expression<int>? startMin,
     Expression<int>? durationMin,
     Expression<int>? priority,
@@ -1687,7 +2093,7 @@ class CollectionItemsCompanion extends UpdateCompanion<CollectionItem> {
     Value<String>? collectionId,
     Value<String?>? templateId,
     Value<String>? title,
-    Value<int>? lane,
+    Value<String>? lane,
     Value<int>? startMin,
     Value<int>? durationMin,
     Value<int>? priority,
@@ -1728,7 +2134,7 @@ class CollectionItemsCompanion extends UpdateCompanion<CollectionItem> {
       map['title'] = Variable<String>(title.value);
     }
     if (lane.present) {
-      map['lane'] = Variable<int>(lane.value);
+      map['lane'] = Variable<String>(lane.value);
     }
     if (startMin.present) {
       map['start_min'] = Variable<int>(startMin.value);
@@ -1833,11 +2239,11 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
   );
   static const VerificationMeta _laneMeta = const VerificationMeta('lane');
   @override
-  late final GeneratedColumn<int> lane = GeneratedColumn<int>(
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
     'lane',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _startMinMeta = const VerificationMeta(
@@ -2073,7 +2479,7 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
         data['${effectivePrefix}weekdays_mask'],
       )!,
       lane: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}lane'],
       )!,
       startMin: attachedDatabase.typeMapping.read(
@@ -2119,7 +2525,7 @@ class Plan extends DataClass implements Insertable<Plan> {
   final String startDate;
   final String endDate;
   final int weekdaysMask;
-  final int lane;
+  final String lane;
   final int startMin;
   final int durationMin;
   final int priority;
@@ -2150,7 +2556,7 @@ class Plan extends DataClass implements Insertable<Plan> {
     map['start_date'] = Variable<String>(startDate);
     map['end_date'] = Variable<String>(endDate);
     map['weekdays_mask'] = Variable<int>(weekdaysMask);
-    map['lane'] = Variable<int>(lane);
+    map['lane'] = Variable<String>(lane);
     map['start_min'] = Variable<int>(startMin);
     map['duration_min'] = Variable<int>(durationMin);
     map['priority'] = Variable<int>(priority);
@@ -2196,7 +2602,7 @@ class Plan extends DataClass implements Insertable<Plan> {
       startDate: serializer.fromJson<String>(json['startDate']),
       endDate: serializer.fromJson<String>(json['endDate']),
       weekdaysMask: serializer.fromJson<int>(json['weekdaysMask']),
-      lane: serializer.fromJson<int>(json['lane']),
+      lane: serializer.fromJson<String>(json['lane']),
       startMin: serializer.fromJson<int>(json['startMin']),
       durationMin: serializer.fromJson<int>(json['durationMin']),
       priority: serializer.fromJson<int>(json['priority']),
@@ -2215,7 +2621,7 @@ class Plan extends DataClass implements Insertable<Plan> {
       'startDate': serializer.toJson<String>(startDate),
       'endDate': serializer.toJson<String>(endDate),
       'weekdaysMask': serializer.toJson<int>(weekdaysMask),
-      'lane': serializer.toJson<int>(lane),
+      'lane': serializer.toJson<String>(lane),
       'startMin': serializer.toJson<int>(startMin),
       'durationMin': serializer.toJson<int>(durationMin),
       'priority': serializer.toJson<int>(priority),
@@ -2232,7 +2638,7 @@ class Plan extends DataClass implements Insertable<Plan> {
     String? startDate,
     String? endDate,
     int? weekdaysMask,
-    int? lane,
+    String? lane,
     int? startMin,
     int? durationMin,
     int? priority,
@@ -2338,7 +2744,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
   final Value<String> startDate;
   final Value<String> endDate;
   final Value<int> weekdaysMask;
-  final Value<int> lane;
+  final Value<String> lane;
   final Value<int> startMin;
   final Value<int> durationMin;
   final Value<int> priority;
@@ -2369,7 +2775,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     required String startDate,
     required String endDate,
     this.weekdaysMask = const Value.absent(),
-    required int lane,
+    required String lane,
     required int startMin,
     required int durationMin,
     this.priority = const Value.absent(),
@@ -2393,7 +2799,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     Expression<String>? startDate,
     Expression<String>? endDate,
     Expression<int>? weekdaysMask,
-    Expression<int>? lane,
+    Expression<String>? lane,
     Expression<int>? startMin,
     Expression<int>? durationMin,
     Expression<int>? priority,
@@ -2427,7 +2833,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     Value<String>? startDate,
     Value<String>? endDate,
     Value<int>? weekdaysMask,
-    Value<int>? lane,
+    Value<String>? lane,
     Value<int>? startMin,
     Value<int>? durationMin,
     Value<int>? priority,
@@ -2474,7 +2880,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
       map['weekdays_mask'] = Variable<int>(weekdaysMask.value);
     }
     if (lane.present) {
-      map['lane'] = Variable<int>(lane.value);
+      map['lane'] = Variable<String>(lane.value);
     }
     if (startMin.present) {
       map['start_min'] = Variable<int>(startMin.value);
@@ -2560,11 +2966,11 @@ class $DayBlocksTable extends DayBlocks
   );
   static const VerificationMeta _laneMeta = const VerificationMeta('lane');
   @override
-  late final GeneratedColumn<int> lane = GeneratedColumn<int>(
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
     'lane',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _startMinMeta = const VerificationMeta(
@@ -2991,7 +3397,7 @@ class $DayBlocksTable extends DayBlocks
         data['${effectivePrefix}title'],
       )!,
       lane: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}lane'],
       )!,
       startMin: attachedDatabase.typeMapping.read(
@@ -3079,7 +3485,7 @@ class DayBlock extends DataClass implements Insertable<DayBlock> {
   final String id;
   final String date;
   final String title;
-  final int lane;
+  final String lane;
   final int startMin;
   final int durationMin;
   final int priority;
@@ -3128,7 +3534,7 @@ class DayBlock extends DataClass implements Insertable<DayBlock> {
     map['id'] = Variable<String>(id);
     map['date'] = Variable<String>(date);
     map['title'] = Variable<String>(title);
-    map['lane'] = Variable<int>(lane);
+    map['lane'] = Variable<String>(lane);
     map['start_min'] = Variable<int>(startMin);
     map['duration_min'] = Variable<int>(durationMin);
     map['priority'] = Variable<int>(priority);
@@ -3216,7 +3622,7 @@ class DayBlock extends DataClass implements Insertable<DayBlock> {
       id: serializer.fromJson<String>(json['id']),
       date: serializer.fromJson<String>(json['date']),
       title: serializer.fromJson<String>(json['title']),
-      lane: serializer.fromJson<int>(json['lane']),
+      lane: serializer.fromJson<String>(json['lane']),
       startMin: serializer.fromJson<int>(json['startMin']),
       durationMin: serializer.fromJson<int>(json['durationMin']),
       priority: serializer.fromJson<int>(json['priority']),
@@ -3244,7 +3650,7 @@ class DayBlock extends DataClass implements Insertable<DayBlock> {
       'id': serializer.toJson<String>(id),
       'date': serializer.toJson<String>(date),
       'title': serializer.toJson<String>(title),
-      'lane': serializer.toJson<int>(lane),
+      'lane': serializer.toJson<String>(lane),
       'startMin': serializer.toJson<int>(startMin),
       'durationMin': serializer.toJson<int>(durationMin),
       'priority': serializer.toJson<int>(priority),
@@ -3270,7 +3676,7 @@ class DayBlock extends DataClass implements Insertable<DayBlock> {
     String? id,
     String? date,
     String? title,
-    int? lane,
+    String? lane,
     int? startMin,
     int? durationMin,
     int? priority,
@@ -3448,7 +3854,7 @@ class DayBlocksCompanion extends UpdateCompanion<DayBlock> {
   final Value<String> id;
   final Value<String> date;
   final Value<String> title;
-  final Value<int> lane;
+  final Value<String> lane;
   final Value<int> startMin;
   final Value<int> durationMin;
   final Value<int> priority;
@@ -3497,7 +3903,7 @@ class DayBlocksCompanion extends UpdateCompanion<DayBlock> {
     required String id,
     required String date,
     required String title,
-    required int lane,
+    required String lane,
     required int startMin,
     required int durationMin,
     required int priority,
@@ -3530,7 +3936,7 @@ class DayBlocksCompanion extends UpdateCompanion<DayBlock> {
     Expression<String>? id,
     Expression<String>? date,
     Expression<String>? title,
-    Expression<int>? lane,
+    Expression<String>? lane,
     Expression<int>? startMin,
     Expression<int>? durationMin,
     Expression<int>? priority,
@@ -3582,7 +3988,7 @@ class DayBlocksCompanion extends UpdateCompanion<DayBlock> {
     Value<String>? id,
     Value<String>? date,
     Value<String>? title,
-    Value<int>? lane,
+    Value<String>? lane,
     Value<int>? startMin,
     Value<int>? durationMin,
     Value<int>? priority,
@@ -3643,7 +4049,7 @@ class DayBlocksCompanion extends UpdateCompanion<DayBlock> {
       map['title'] = Variable<String>(title.value);
     }
     if (lane.present) {
-      map['lane'] = Variable<int>(lane.value);
+      map['lane'] = Variable<String>(lane.value);
     }
     if (startMin.present) {
       map['start_min'] = Variable<int>(startMin.value);
@@ -3782,11 +4188,11 @@ class $CompletionLogsTable extends CompletionLogs
   );
   static const VerificationMeta _laneMeta = const VerificationMeta('lane');
   @override
-  late final GeneratedColumn<int> lane = GeneratedColumn<int>(
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
     'lane',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _startMinMeta = const VerificationMeta(
@@ -3955,7 +4361,7 @@ class $CompletionLogsTable extends CompletionLogs
         data['${effectivePrefix}title'],
       )!,
       lane: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}lane'],
       )!,
       startMin: attachedDatabase.typeMapping.read(
@@ -3988,7 +4394,7 @@ class CompletionLog extends DataClass implements Insertable<CompletionLog> {
   final String dayBlockId;
   final String date;
   final String title;
-  final int lane;
+  final String lane;
   final int startMin;
   final int durationMin;
   final DateTime completedAt;
@@ -4011,7 +4417,7 @@ class CompletionLog extends DataClass implements Insertable<CompletionLog> {
     map['day_block_id'] = Variable<String>(dayBlockId);
     map['date'] = Variable<String>(date);
     map['title'] = Variable<String>(title);
-    map['lane'] = Variable<int>(lane);
+    map['lane'] = Variable<String>(lane);
     map['start_min'] = Variable<int>(startMin);
     map['duration_min'] = Variable<int>(durationMin);
     map['completed_at'] = Variable<DateTime>(completedAt);
@@ -4045,7 +4451,7 @@ class CompletionLog extends DataClass implements Insertable<CompletionLog> {
       dayBlockId: serializer.fromJson<String>(json['dayBlockId']),
       date: serializer.fromJson<String>(json['date']),
       title: serializer.fromJson<String>(json['title']),
-      lane: serializer.fromJson<int>(json['lane']),
+      lane: serializer.fromJson<String>(json['lane']),
       startMin: serializer.fromJson<int>(json['startMin']),
       durationMin: serializer.fromJson<int>(json['durationMin']),
       completedAt: serializer.fromJson<DateTime>(json['completedAt']),
@@ -4060,7 +4466,7 @@ class CompletionLog extends DataClass implements Insertable<CompletionLog> {
       'dayBlockId': serializer.toJson<String>(dayBlockId),
       'date': serializer.toJson<String>(date),
       'title': serializer.toJson<String>(title),
-      'lane': serializer.toJson<int>(lane),
+      'lane': serializer.toJson<String>(lane),
       'startMin': serializer.toJson<int>(startMin),
       'durationMin': serializer.toJson<int>(durationMin),
       'completedAt': serializer.toJson<DateTime>(completedAt),
@@ -4073,7 +4479,7 @@ class CompletionLog extends DataClass implements Insertable<CompletionLog> {
     String? dayBlockId,
     String? date,
     String? title,
-    int? lane,
+    String? lane,
     int? startMin,
     int? durationMin,
     DateTime? completedAt,
@@ -4157,7 +4563,7 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
   final Value<String> dayBlockId;
   final Value<String> date;
   final Value<String> title;
-  final Value<int> lane;
+  final Value<String> lane;
   final Value<int> startMin;
   final Value<int> durationMin;
   final Value<DateTime> completedAt;
@@ -4180,7 +4586,7 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
     required String dayBlockId,
     required String date,
     required String title,
-    required int lane,
+    required String lane,
     this.startMin = const Value.absent(),
     this.durationMin = const Value.absent(),
     required DateTime completedAt,
@@ -4197,7 +4603,7 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
     Expression<String>? dayBlockId,
     Expression<String>? date,
     Expression<String>? title,
-    Expression<int>? lane,
+    Expression<String>? lane,
     Expression<int>? startMin,
     Expression<int>? durationMin,
     Expression<DateTime>? completedAt,
@@ -4223,7 +4629,7 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
     Value<String>? dayBlockId,
     Value<String>? date,
     Value<String>? title,
-    Value<int>? lane,
+    Value<String>? lane,
     Value<int>? startMin,
     Value<int>? durationMin,
     Value<DateTime>? completedAt,
@@ -4260,7 +4666,7 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
       map['title'] = Variable<String>(title.value);
     }
     if (lane.present) {
-      map['lane'] = Variable<int>(lane.value);
+      map['lane'] = Variable<String>(lane.value);
     }
     if (startMin.present) {
       map['start_min'] = Variable<int>(startMin.value);
@@ -4298,9 +4704,657 @@ class CompletionLogsCompanion extends UpdateCompanion<CompletionLog> {
   }
 }
 
+class $InboxItemsTable extends InboxItems
+    with TableInfo<$InboxItemsTable, InboxItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InboxItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _laneMeta = const VerificationMeta('lane');
+  @override
+  late final GeneratedColumn<String> lane = GeneratedColumn<String>(
+    'lane',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('temp'),
+  );
+  static const VerificationMeta _startMinMeta = const VerificationMeta(
+    'startMin',
+  );
+  @override
+  late final GeneratedColumn<int> startMin = GeneratedColumn<int>(
+    'start_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _durationMinMeta = const VerificationMeta(
+    'durationMin',
+  );
+  @override
+  late final GeneratedColumn<int> durationMin = GeneratedColumn<int>(
+    'duration_min',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(30),
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<int> priority = GeneratedColumn<int>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    note,
+    lane,
+    startMin,
+    durationMin,
+    priority,
+    day,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'inbox_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InboxItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('lane')) {
+      context.handle(
+        _laneMeta,
+        lane.isAcceptableOrUnknown(data['lane']!, _laneMeta),
+      );
+    }
+    if (data.containsKey('start_min')) {
+      context.handle(
+        _startMinMeta,
+        startMin.isAcceptableOrUnknown(data['start_min']!, _startMinMeta),
+      );
+    }
+    if (data.containsKey('duration_min')) {
+      context.handle(
+        _durationMinMeta,
+        durationMin.isAcceptableOrUnknown(
+          data['duration_min']!,
+          _durationMinMeta,
+        ),
+      );
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InboxItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InboxItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      lane: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lane'],
+      )!,
+      startMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_min'],
+      ),
+      durationMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_min'],
+      )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}priority'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $InboxItemsTable createAlias(String alias) {
+    return $InboxItemsTable(attachedDatabase, alias);
+  }
+}
+
+class InboxItem extends DataClass implements Insertable<InboxItem> {
+  final String id;
+  final String title;
+  final String? note;
+  final String lane;
+  final int? startMin;
+  final int durationMin;
+  final int priority;
+  final String? day;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const InboxItem({
+    required this.id,
+    required this.title,
+    this.note,
+    required this.lane,
+    this.startMin,
+    required this.durationMin,
+    required this.priority,
+    this.day,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['lane'] = Variable<String>(lane);
+    if (!nullToAbsent || startMin != null) {
+      map['start_min'] = Variable<int>(startMin);
+    }
+    map['duration_min'] = Variable<int>(durationMin);
+    map['priority'] = Variable<int>(priority);
+    if (!nullToAbsent || day != null) {
+      map['day'] = Variable<String>(day);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  InboxItemsCompanion toCompanion(bool nullToAbsent) {
+    return InboxItemsCompanion(
+      id: Value(id),
+      title: Value(title),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      lane: Value(lane),
+      startMin: startMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startMin),
+      durationMin: Value(durationMin),
+      priority: Value(priority),
+      day: day == null && nullToAbsent ? const Value.absent() : Value(day),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory InboxItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InboxItem(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      note: serializer.fromJson<String?>(json['note']),
+      lane: serializer.fromJson<String>(json['lane']),
+      startMin: serializer.fromJson<int?>(json['startMin']),
+      durationMin: serializer.fromJson<int>(json['durationMin']),
+      priority: serializer.fromJson<int>(json['priority']),
+      day: serializer.fromJson<String?>(json['day']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'note': serializer.toJson<String?>(note),
+      'lane': serializer.toJson<String>(lane),
+      'startMin': serializer.toJson<int?>(startMin),
+      'durationMin': serializer.toJson<int>(durationMin),
+      'priority': serializer.toJson<int>(priority),
+      'day': serializer.toJson<String?>(day),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  InboxItem copyWith({
+    String? id,
+    String? title,
+    Value<String?> note = const Value.absent(),
+    String? lane,
+    Value<int?> startMin = const Value.absent(),
+    int? durationMin,
+    int? priority,
+    Value<String?> day = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => InboxItem(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    note: note.present ? note.value : this.note,
+    lane: lane ?? this.lane,
+    startMin: startMin.present ? startMin.value : this.startMin,
+    durationMin: durationMin ?? this.durationMin,
+    priority: priority ?? this.priority,
+    day: day.present ? day.value : this.day,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  InboxItem copyWithCompanion(InboxItemsCompanion data) {
+    return InboxItem(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      note: data.note.present ? data.note.value : this.note,
+      lane: data.lane.present ? data.lane.value : this.lane,
+      startMin: data.startMin.present ? data.startMin.value : this.startMin,
+      durationMin: data.durationMin.present
+          ? data.durationMin.value
+          : this.durationMin,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      day: data.day.present ? data.day.value : this.day,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InboxItem(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('note: $note, ')
+          ..write('lane: $lane, ')
+          ..write('startMin: $startMin, ')
+          ..write('durationMin: $durationMin, ')
+          ..write('priority: $priority, ')
+          ..write('day: $day, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    note,
+    lane,
+    startMin,
+    durationMin,
+    priority,
+    day,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InboxItem &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.note == this.note &&
+          other.lane == this.lane &&
+          other.startMin == this.startMin &&
+          other.durationMin == this.durationMin &&
+          other.priority == this.priority &&
+          other.day == this.day &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class InboxItemsCompanion extends UpdateCompanion<InboxItem> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String?> note;
+  final Value<String> lane;
+  final Value<int?> startMin;
+  final Value<int> durationMin;
+  final Value<int> priority;
+  final Value<String?> day;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const InboxItemsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.note = const Value.absent(),
+    this.lane = const Value.absent(),
+    this.startMin = const Value.absent(),
+    this.durationMin = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.day = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  InboxItemsCompanion.insert({
+    required String id,
+    required String title,
+    this.note = const Value.absent(),
+    this.lane = const Value.absent(),
+    this.startMin = const Value.absent(),
+    this.durationMin = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.day = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<InboxItem> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? note,
+    Expression<String>? lane,
+    Expression<int>? startMin,
+    Expression<int>? durationMin,
+    Expression<int>? priority,
+    Expression<String>? day,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (note != null) 'note': note,
+      if (lane != null) 'lane': lane,
+      if (startMin != null) 'start_min': startMin,
+      if (durationMin != null) 'duration_min': durationMin,
+      if (priority != null) 'priority': priority,
+      if (day != null) 'day': day,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  InboxItemsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String?>? note,
+    Value<String>? lane,
+    Value<int?>? startMin,
+    Value<int>? durationMin,
+    Value<int>? priority,
+    Value<String?>? day,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return InboxItemsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      note: note ?? this.note,
+      lane: lane ?? this.lane,
+      startMin: startMin ?? this.startMin,
+      durationMin: durationMin ?? this.durationMin,
+      priority: priority ?? this.priority,
+      day: day ?? this.day,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (lane.present) {
+      map['lane'] = Variable<String>(lane.value);
+    }
+    if (startMin.present) {
+      map['start_min'] = Variable<int>(startMin.value);
+    }
+    if (durationMin.present) {
+      map['duration_min'] = Variable<int>(durationMin.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<int>(priority.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InboxItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('note: $note, ')
+          ..write('lane: $lane, ')
+          ..write('startMin: $startMin, ')
+          ..write('durationMin: $durationMin, ')
+          ..write('priority: $priority, ')
+          ..write('day: $day, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$TntDatabase extends GeneratedDatabase {
   _$TntDatabase(QueryExecutor e) : super(e);
   $TntDatabaseManager get managers => $TntDatabaseManager(this);
+  late final $LaneRowsTable laneRows = $LaneRowsTable(this);
   late final $BlockTemplatesTable blockTemplates = $BlockTemplatesTable(this);
   late final $CollectionsTable collections = $CollectionsTable(this);
   late final $CollectionItemsTable collectionItems = $CollectionItemsTable(
@@ -4309,17 +5363,20 @@ abstract class _$TntDatabase extends GeneratedDatabase {
   late final $PlansTable plans = $PlansTable(this);
   late final $DayBlocksTable dayBlocks = $DayBlocksTable(this);
   late final $CompletionLogsTable completionLogs = $CompletionLogsTable(this);
+  late final $InboxItemsTable inboxItems = $InboxItemsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    laneRows,
     blockTemplates,
     collections,
     collectionItems,
     plans,
     dayBlocks,
     completionLogs,
+    inboxItems,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4333,11 +5390,231 @@ abstract class _$TntDatabase extends GeneratedDatabase {
   ]);
 }
 
+typedef $$LaneRowsTableCreateCompanionBuilder = LaneRowsCompanion Function({
+  required String id,
+  required String name,
+  Value<int> sortOrder,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> rowid,
+});
+typedef $$LaneRowsTableUpdateCompanionBuilder = LaneRowsCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<int> sortOrder,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> rowid,
+});
+
+class $$LaneRowsTableFilterComposer
+    extends Composer<_$TntDatabase, $LaneRowsTable> {
+  $$LaneRowsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LaneRowsTableOrderingComposer
+    extends Composer<_$TntDatabase, $LaneRowsTable> {
+  $$LaneRowsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LaneRowsTableAnnotationComposer
+    extends Composer<_$TntDatabase, $LaneRowsTable> {
+  $$LaneRowsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$LaneRowsTableTableManager
+    extends
+        RootTableManager<
+          _$TntDatabase,
+          $LaneRowsTable,
+          LaneRow,
+          $$LaneRowsTableFilterComposer,
+          $$LaneRowsTableOrderingComposer,
+          $$LaneRowsTableAnnotationComposer,
+          $$LaneRowsTableCreateCompanionBuilder,
+          $$LaneRowsTableUpdateCompanionBuilder,
+          (LaneRow, BaseReferences<_$TntDatabase, $LaneRowsTable, LaneRow>),
+          LaneRow,
+          PrefetchHooks Function()
+        > {
+  $$LaneRowsTableTableManager(_$TntDatabase db, $LaneRowsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LaneRowsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LaneRowsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LaneRowsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LaneRowsCompanion(
+                id: id,
+                name: name,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LaneRowsCompanion.insert(
+                id: id,
+                name: name,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LaneRowsTable, LaneRow>(table),
+                  BaseReferences<_$TntDatabase, $LaneRowsTable, LaneRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LaneRowsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$TntDatabase,
+      $LaneRowsTable,
+      LaneRow,
+      $$LaneRowsTableFilterComposer,
+      $$LaneRowsTableOrderingComposer,
+      $$LaneRowsTableAnnotationComposer,
+      $$LaneRowsTableCreateCompanionBuilder,
+      $$LaneRowsTableUpdateCompanionBuilder,
+      (LaneRow, BaseReferences<_$TntDatabase, $LaneRowsTable, LaneRow>),
+      LaneRow,
+      PrefetchHooks Function()
+    >;
 typedef $$BlockTemplatesTableCreateCompanionBuilder =
     BlockTemplatesCompanion Function({
       required String id,
       required String title,
-      required int lane,
+      required String lane,
       Value<int> priority,
       Value<int> durationMin,
       Value<int?> startMin,
@@ -4352,7 +5629,7 @@ typedef $$BlockTemplatesTableUpdateCompanionBuilder =
     BlockTemplatesCompanion Function({
       Value<String> id,
       Value<String> title,
-      Value<int> lane,
+      Value<String> lane,
       Value<int> priority,
       Value<int> durationMin,
       Value<int?> startMin,
@@ -4383,7 +5660,7 @@ class $$BlockTemplatesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lane => $composableBuilder(
+  ColumnFilters<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnFilters(column),
   );
@@ -4448,7 +5725,7 @@ class $$BlockTemplatesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lane => $composableBuilder(
+  ColumnOrderings<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4509,7 +5786,7 @@ class $$BlockTemplatesTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<int> get lane =>
+  GeneratedColumn<String> get lane =>
       $composableBuilder(column: $table.lane, builder: (column) => column);
 
   GeneratedColumn<int> get priority =>
@@ -4576,7 +5853,7 @@ class $$BlockTemplatesTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<int> lane = const Value.absent(),
+                Value<String> lane = const Value.absent(),
                 Value<int> priority = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<int?> startMin = const Value.absent(),
@@ -4604,7 +5881,7 @@ class $$BlockTemplatesTableTableManager
               ({
                 required String id,
                 required String title,
-                required int lane,
+                required String lane,
                 Value<int> priority = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<int?> startMin = const Value.absent(),
@@ -5012,7 +6289,7 @@ typedef $$CollectionItemsTableCreateCompanionBuilder =
       required String collectionId,
       Value<String?> templateId,
       required String title,
-      required int lane,
+      required String lane,
       required int startMin,
       required int durationMin,
       Value<int> priority,
@@ -5027,7 +6304,7 @@ typedef $$CollectionItemsTableUpdateCompanionBuilder =
       Value<String> collectionId,
       Value<String?> templateId,
       Value<String> title,
-      Value<int> lane,
+      Value<String> lane,
       Value<int> startMin,
       Value<int> durationMin,
       Value<int> priority,
@@ -5089,7 +6366,7 @@ class $$CollectionItemsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lane => $composableBuilder(
+  ColumnFilters<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnFilters(column),
   );
@@ -5172,7 +6449,7 @@ class $$CollectionItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lane => $composableBuilder(
+  ColumnOrderings<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5251,7 +6528,7 @@ class $$CollectionItemsTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<int> get lane =>
+  GeneratedColumn<String> get lane =>
       $composableBuilder(column: $table.lane, builder: (column) => column);
 
   GeneratedColumn<int> get startMin =>
@@ -5332,7 +6609,7 @@ class $$CollectionItemsTableTableManager
                 Value<String> collectionId = const Value.absent(),
                 Value<String?> templateId = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<int> lane = const Value.absent(),
+                Value<String> lane = const Value.absent(),
                 Value<int> startMin = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<int> priority = const Value.absent(),
@@ -5360,7 +6637,7 @@ class $$CollectionItemsTableTableManager
                 required String collectionId,
                 Value<String?> templateId = const Value.absent(),
                 required String title,
-                required int lane,
+                required String lane,
                 required int startMin,
                 required int durationMin,
                 Value<int> priority = const Value.absent(),
@@ -5453,7 +6730,7 @@ typedef $$PlansTableCreateCompanionBuilder = PlansCompanion Function({
   required String startDate,
   required String endDate,
   Value<int> weekdaysMask,
-  required int lane,
+  required String lane,
   required int startMin,
   required int durationMin,
   Value<int> priority,
@@ -5469,7 +6746,7 @@ typedef $$PlansTableUpdateCompanionBuilder = PlansCompanion Function({
   Value<String> startDate,
   Value<String> endDate,
   Value<int> weekdaysMask,
-  Value<int> lane,
+  Value<String> lane,
   Value<int> startMin,
   Value<int> durationMin,
   Value<int> priority,
@@ -5513,7 +6790,7 @@ class $$PlansTableFilterComposer extends Composer<_$TntDatabase, $PlansTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lane => $composableBuilder(
+  ColumnFilters<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnFilters(column),
   );
@@ -5588,7 +6865,7 @@ class $$PlansTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lane => $composableBuilder(
+  ColumnOrderings<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5655,7 +6932,7 @@ class $$PlansTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get lane =>
+  GeneratedColumn<String> get lane =>
       $composableBuilder(column: $table.lane, builder: (column) => column);
 
   GeneratedColumn<int> get startMin =>
@@ -5715,7 +6992,7 @@ class $$PlansTableTableManager
                 Value<String> startDate = const Value.absent(),
                 Value<String> endDate = const Value.absent(),
                 Value<int> weekdaysMask = const Value.absent(),
-                Value<int> lane = const Value.absent(),
+                Value<String> lane = const Value.absent(),
                 Value<int> startMin = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<int> priority = const Value.absent(),
@@ -5747,7 +7024,7 @@ class $$PlansTableTableManager
                 required String startDate,
                 required String endDate,
                 Value<int> weekdaysMask = const Value.absent(),
-                required int lane,
+                required String lane,
                 required int startMin,
                 required int durationMin,
                 Value<int> priority = const Value.absent(),
@@ -5807,7 +7084,7 @@ typedef $$DayBlocksTableCreateCompanionBuilder = DayBlocksCompanion Function({
   required String id,
   required String date,
   required String title,
-  required int lane,
+  required String lane,
   required int startMin,
   required int durationMin,
   required int priority,
@@ -5832,7 +7109,7 @@ typedef $$DayBlocksTableUpdateCompanionBuilder = DayBlocksCompanion Function({
   Value<String> id,
   Value<String> date,
   Value<String> title,
-  Value<int> lane,
+  Value<String> lane,
   Value<int> startMin,
   Value<int> durationMin,
   Value<int> priority,
@@ -5878,7 +7155,7 @@ class $$DayBlocksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lane => $composableBuilder(
+  ColumnFilters<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnFilters(column),
   );
@@ -5998,7 +7275,7 @@ class $$DayBlocksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lane => $composableBuilder(
+  ColumnOrderings<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6112,7 +7389,7 @@ class $$DayBlocksTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<int> get lane =>
+  GeneratedColumn<String> get lane =>
       $composableBuilder(column: $table.lane, builder: (column) => column);
 
   GeneratedColumn<int> get startMin =>
@@ -6219,7 +7496,7 @@ class $$DayBlocksTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> date = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<int> lane = const Value.absent(),
+                Value<String> lane = const Value.absent(),
                 Value<int> startMin = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<int> priority = const Value.absent(),
@@ -6269,7 +7546,7 @@ class $$DayBlocksTableTableManager
                 required String id,
                 required String date,
                 required String title,
-                required int lane,
+                required String lane,
                 required int startMin,
                 required int durationMin,
                 required int priority,
@@ -6351,7 +7628,7 @@ typedef $$CompletionLogsTableCreateCompanionBuilder =
       required String dayBlockId,
       required String date,
       required String title,
-      required int lane,
+      required String lane,
       Value<int> startMin,
       Value<int> durationMin,
       required DateTime completedAt,
@@ -6364,7 +7641,7 @@ typedef $$CompletionLogsTableUpdateCompanionBuilder =
       Value<String> dayBlockId,
       Value<String> date,
       Value<String> title,
-      Value<int> lane,
+      Value<String> lane,
       Value<int> startMin,
       Value<int> durationMin,
       Value<DateTime> completedAt,
@@ -6401,7 +7678,7 @@ class $$CompletionLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lane => $composableBuilder(
+  ColumnFilters<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnFilters(column),
   );
@@ -6456,7 +7733,7 @@ class $$CompletionLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lane => $composableBuilder(
+  ColumnOrderings<String> get lane => $composableBuilder(
     column: $table.lane,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6505,7 +7782,7 @@ class $$CompletionLogsTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<int> get lane =>
+  GeneratedColumn<String> get lane =>
       $composableBuilder(column: $table.lane, builder: (column) => column);
 
   GeneratedColumn<int> get startMin =>
@@ -6562,7 +7839,7 @@ class $$CompletionLogsTableTableManager
                 Value<String> dayBlockId = const Value.absent(),
                 Value<String> date = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<int> lane = const Value.absent(),
+                Value<String> lane = const Value.absent(),
                 Value<int> startMin = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 Value<DateTime> completedAt = const Value.absent(),
@@ -6586,7 +7863,7 @@ class $$CompletionLogsTableTableManager
                 required String dayBlockId,
                 required String date,
                 required String title,
-                required int lane,
+                required String lane,
                 Value<int> startMin = const Value.absent(),
                 Value<int> durationMin = const Value.absent(),
                 required DateTime completedAt,
@@ -6638,10 +7915,332 @@ typedef $$CompletionLogsTableProcessedTableManager =
       CompletionLog,
       PrefetchHooks Function()
     >;
+typedef $$InboxItemsTableCreateCompanionBuilder = InboxItemsCompanion Function({
+  required String id,
+  required String title,
+  Value<String?> note,
+  Value<String> lane,
+  Value<int?> startMin,
+  Value<int> durationMin,
+  Value<int> priority,
+  Value<String?> day,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> rowid,
+});
+typedef $$InboxItemsTableUpdateCompanionBuilder = InboxItemsCompanion Function({
+  Value<String> id,
+  Value<String> title,
+  Value<String?> note,
+  Value<String> lane,
+  Value<int?> startMin,
+  Value<int> durationMin,
+  Value<int> priority,
+  Value<String?> day,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> rowid,
+});
+
+class $$InboxItemsTableFilterComposer
+    extends Composer<_$TntDatabase, $InboxItemsTable> {
+  $$InboxItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lane => $composableBuilder(
+    column: $table.lane,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMin => $composableBuilder(
+    column: $table.startMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMin => $composableBuilder(
+    column: $table.durationMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InboxItemsTableOrderingComposer
+    extends Composer<_$TntDatabase, $InboxItemsTable> {
+  $$InboxItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lane => $composableBuilder(
+    column: $table.lane,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMin => $composableBuilder(
+    column: $table.startMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMin => $composableBuilder(
+    column: $table.durationMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InboxItemsTableAnnotationComposer
+    extends Composer<_$TntDatabase, $InboxItemsTable> {
+  $$InboxItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get lane =>
+      $composableBuilder(column: $table.lane, builder: (column) => column);
+
+  GeneratedColumn<int> get startMin =>
+      $composableBuilder(column: $table.startMin, builder: (column) => column);
+
+  GeneratedColumn<int> get durationMin => $composableBuilder(
+    column: $table.durationMin,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$InboxItemsTableTableManager
+    extends
+        RootTableManager<
+          _$TntDatabase,
+          $InboxItemsTable,
+          InboxItem,
+          $$InboxItemsTableFilterComposer,
+          $$InboxItemsTableOrderingComposer,
+          $$InboxItemsTableAnnotationComposer,
+          $$InboxItemsTableCreateCompanionBuilder,
+          $$InboxItemsTableUpdateCompanionBuilder,
+          (
+            InboxItem,
+            BaseReferences<_$TntDatabase, $InboxItemsTable, InboxItem>,
+          ),
+          InboxItem,
+          PrefetchHooks Function()
+        > {
+  $$InboxItemsTableTableManager(_$TntDatabase db, $InboxItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InboxItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InboxItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InboxItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String> lane = const Value.absent(),
+                Value<int?> startMin = const Value.absent(),
+                Value<int> durationMin = const Value.absent(),
+                Value<int> priority = const Value.absent(),
+                Value<String?> day = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InboxItemsCompanion(
+                id: id,
+                title: title,
+                note: note,
+                lane: lane,
+                startMin: startMin,
+                durationMin: durationMin,
+                priority: priority,
+                day: day,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                Value<String?> note = const Value.absent(),
+                Value<String> lane = const Value.absent(),
+                Value<int?> startMin = const Value.absent(),
+                Value<int> durationMin = const Value.absent(),
+                Value<int> priority = const Value.absent(),
+                Value<String?> day = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InboxItemsCompanion.insert(
+                id: id,
+                title: title,
+                note: note,
+                lane: lane,
+                startMin: startMin,
+                durationMin: durationMin,
+                priority: priority,
+                day: day,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$InboxItemsTable, InboxItem>(table),
+                  BaseReferences<_$TntDatabase, $InboxItemsTable, InboxItem>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InboxItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$TntDatabase,
+      $InboxItemsTable,
+      InboxItem,
+      $$InboxItemsTableFilterComposer,
+      $$InboxItemsTableOrderingComposer,
+      $$InboxItemsTableAnnotationComposer,
+      $$InboxItemsTableCreateCompanionBuilder,
+      $$InboxItemsTableUpdateCompanionBuilder,
+      (InboxItem, BaseReferences<_$TntDatabase, $InboxItemsTable, InboxItem>),
+      InboxItem,
+      PrefetchHooks Function()
+    >;
 
 class $TntDatabaseManager {
   final _$TntDatabase _db;
   $TntDatabaseManager(this._db);
+  $$LaneRowsTableTableManager get laneRows =>
+      $$LaneRowsTableTableManager(_db, _db.laneRows);
   $$BlockTemplatesTableTableManager get blockTemplates =>
       $$BlockTemplatesTableTableManager(_db, _db.blockTemplates);
   $$CollectionsTableTableManager get collections =>
@@ -6654,4 +8253,6 @@ class $TntDatabaseManager {
       $$DayBlocksTableTableManager(_db, _db.dayBlocks);
   $$CompletionLogsTableTableManager get completionLogs =>
       $$CompletionLogsTableTableManager(_db, _db.completionLogs);
+  $$InboxItemsTableTableManager get inboxItems =>
+      $$InboxItemsTableTableManager(_db, _db.inboxItems);
 }

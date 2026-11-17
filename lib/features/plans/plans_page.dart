@@ -52,7 +52,7 @@ class PlansPage extends ConsumerWidget {
           error: (error, _) => Center(
             child: Text(
               '$error',
-              style: const TextStyle(color: Palette.textDim, fontSize: 12),
+              style: TextStyle(color: Palette.textDim, fontSize: 12),
             ),
           ),
           data: (rows) {
@@ -63,7 +63,7 @@ class PlansPage extends ConsumerWidget {
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final plan = rows[index];
-                return _PlanTile(
+                return PlanTile(
                   plan: plan,
                   onTap: () => _edit(context, ref, plan: plan),
                 );
@@ -81,7 +81,7 @@ class _EmptyPlans extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 40),
         child: Text(
@@ -94,8 +94,8 @@ class _EmptyPlans extends StatelessWidget {
   }
 }
 
-class _PlanTile extends StatelessWidget {
-  const _PlanTile({required this.plan, required this.onTap});
+class PlanTile extends StatelessWidget {
+  const PlanTile({super.key, required this.plan, required this.onTap});
 
   final Plan plan;
   final VoidCallback onTap;
@@ -143,7 +143,7 @@ class _PlanTile extends StatelessWidget {
                 children: [
                   Text(
                     plan.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -152,7 +152,7 @@ class _PlanTile extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     '${plan.startDate} → ${plan.endDate} · $_weekdays',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textSecondary,
                       fontSize: 11,
                     ),
@@ -164,8 +164,8 @@ class _PlanTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${Lane.byIndex(plan.lane).label} ${formatMinute(plan.startMin)}',
-                  style: const TextStyle(
+                  '${Lane(id: plan.lane, name: plan.lane).name} ${formatMinute(plan.startMin)}',
+                  style: TextStyle(
                     color: Palette.textSecondary,
                     fontSize: 11,
                   ),
@@ -173,7 +173,7 @@ class _PlanTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   formatDuration(plan.durationMin),
-                  style: const TextStyle(color: Palette.textDim, fontSize: 10),
+                  style: TextStyle(color: Palette.textDim, fontSize: 10),
                 ),
               ],
             ),

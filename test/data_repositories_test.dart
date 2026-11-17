@@ -103,7 +103,7 @@ void main() {
         startDate: Value(startDate),
         endDate: Value(endDate),
         weekdaysMask: Value(mask),
-        lane: const Value(1),
+        lane: const Value('habit'),
         startMin: const Value(540),
         durationMin: const Value(60),
         priority: const Value(2),

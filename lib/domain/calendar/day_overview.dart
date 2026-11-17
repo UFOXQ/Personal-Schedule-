@@ -23,7 +23,7 @@ class DayOverview {
 
   /// 按泳道数数
   Map<Lane, int> get laneCounts {
-    final counts = {for (final lane in Lane.values) lane: 0};
+    final counts = {for (final lane in Lane.defaults) lane: 0};
     for (final block in blocks) {
       counts[block.lane] = (counts[block.lane] ?? 0) + 1;
     }

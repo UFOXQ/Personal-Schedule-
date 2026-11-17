@@ -12,9 +12,11 @@ import 'package:timezone/timezone.dart' as tz;
 
 // 通知插件里也有一个 Priority（min/low/default/high/max），这里用它的；
 // 所以把业务模型的 Priority 隐藏掉，避免同名冲突。
+import '../../core/app_log.dart';
 import '../../domain/models/tblock.dart' hide Priority;
 import '../../domain/reminders.dart';
 import '../../features/settings/reminder_settings.dart';
+import 'desktop_toast.dart';
 
 /// 通知权限 / 精确闹钟的当前状态（给设置面板展示）。
 class NotificationPermissionState {
@@ -91,6 +93,7 @@ class LocalReminderScheduler implements ReminderScheduler {
   bool _ready = false;
 
   bool get _isAndroid => !kIsWeb && Platform.isAndroid;
+  bool get _isWindows => !kIsWeb && Platform.isWindows;
   bool get _isDesktop => !kIsWeb && (Platform.isWindows || Platform.isLinux);
 
   @override
@@ -105,13 +108,7 @@ class LocalReminderScheduler implements ReminderScheduler {
 
   Future<void> _initAndroid() async {
     tzdata.initializeTimeZones();
-    try {
-      final info = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(info.identifier));
-    } catch (error) {
-      debugPrint('TNT: 取本地时区失败，退回北京时间 -> $error');
-      tz.setLocalLocation(tz.getLocation('Asia/Shanghai'));
-    }
+    tz.setLocalLocation(await _resolveLocation());
 
     try {
       await _plugin.initialize(
@@ -121,8 +118,32 @@ class LocalReminderScheduler implements ReminderScheduler {
       );
       _ready = true;
     } catch (error) {
-      debugPrint('TNT: 通知插件初始化失败 -> $error');
+      await appLog('通知插件初始化失败 -> $error');
     }
+  }
+
+  /// 取本机时区。真实手机一般能拿到 `Asia/Shanghai` 这种名字，
+  /// 但模拟器/部分 ROM 会返回 `GMT`、`CST` 这类 timezone 包里没有的名字，
+  /// 这时按当前 UTC 偏移退回 `Etc/GMT±N`，再不行才用 UTC ——
+  /// 免得写死北京时间把外地的时间算错几个小时。
+  Future<tz.Location> _resolveLocation() async {
+    try {
+      final info = await FlutterTimezone.getLocalTimezone();
+      return tz.getLocation(info.identifier);
+    } catch (error) {
+      await appLog('取本地时区失败，按 UTC 偏移兜底 -> $error');
+    }
+    final offset = DateTime.now().timeZoneOffset;
+    final hours = offset.inMinutes ~/ 60;
+    final sign = hours >= 0 ? '-' : '+'; // Etc/GMT 的符号与常见写法相反
+    for (final name in ['Etc/GMT$sign${hours.abs()}', 'UTC']) {
+      try {
+        return tz.getLocation(name);
+      } catch (_) {
+        continue;
+      }
+    }
+    return tz.UTC;
   }
 
   Future<void> _initDesktop() async {
@@ -215,6 +236,9 @@ class LocalReminderScheduler implements ReminderScheduler {
         day: day,
         leadMinutes: settings.leadMinutes,
         now: DateTime.now(),
+        workdaysOnly: settings.workdaysOnly,
+        quietStartMin: settings.quietEnabled ? settings.quietStartMin : null,
+        quietEndMin: settings.quietEnabled ? settings.quietEndMin : null,
       );
       // 已经弹过的（时间在过去）也算「还活着」，不能撤 —— 否则到点响完，
       // 下一次 sync 会把它从通知栏里一起清掉。只有方块被删/完成才撤。
@@ -263,6 +287,9 @@ class LocalReminderScheduler implements ReminderScheduler {
       day: day,
       leadMinutes: settings.leadMinutes,
       now: now,
+      workdaysOnly: settings.workdaysOnly,
+      quietStartMin: settings.quietEnabled ? settings.quietStartMin : null,
+      quietEndMin: settings.quietEnabled ? settings.quietEndMin : null,
     );
     for (final reminder in reminders) {
       final delay = reminder.at.difference(now);
@@ -277,14 +304,21 @@ class LocalReminderScheduler implements ReminderScheduler {
     }
   }
 
+  /// 桌面端提醒：优先走 runner 里的原生 toast（Windows 通知中心里能看到），
+  /// 失败再退回 local_notifier（Linux 上还能用），最后至少还有应用内横幅。
   Future<void> _notifyDesktop({
     required String title,
     required String body,
   }) async {
+    if (_isWindows) {
+      final ok = await desktopToast.show(title: title, body: body);
+      if (ok) return;
+      await appLog('系统通知没发出去，退回落地方案（检查是否以低权限/沙箱运行）');
+    }
     try {
       await localNotifier.notify(LocalNotification(title: title, body: body));
     } catch (error) {
-      debugPrint('TNT: 桌面通知发送失败 -> $error');
+      await appLog('桌面通知发送失败 -> $error');
     }
   }
 

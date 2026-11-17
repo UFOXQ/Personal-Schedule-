@@ -56,7 +56,7 @@ class _PlanEditorState extends ConsumerState<_PlanEditor> {
         ? today.add(const Duration(days: 30))
         : DateTime.parse(plan.endDate);
     _weekdays = plan?.weekdaysMask ?? 127;
-    _lane = Lane.byIndex(plan?.lane ?? Lane.habit.index);
+    _lane = Lane(id: plan?.lane ?? Lane.habit.id, name: plan?.lane ?? Lane.habit.id);
     _startMin = plan?.startMin ?? 540;
     _duration = plan?.durationMin ?? 60;
     _priority =
@@ -155,7 +155,7 @@ class _PlanEditorState extends ConsumerState<_PlanEditor> {
           children: [
             Text(
               _isEditing ? '编辑计划' : '新建计划',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Palette.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -164,7 +164,7 @@ class _PlanEditorState extends ConsumerState<_PlanEditor> {
             const SizedBox(height: 12),
             TextField(
               controller: _title,
-              style: const TextStyle(color: Palette.textPrimary, fontSize: 14),
+              style: TextStyle(color: Palette.textPrimary, fontSize: 14),
               decoration: const InputDecoration(
                 labelText: '计划名称',
                 isDense: true,
@@ -211,11 +211,11 @@ class _PlanEditorState extends ConsumerState<_PlanEditor> {
             const SizedBox(height: 6),
             Row(
               children: [
-                for (final lane in Lane.values)
+                for (final lane in Lane.defaults)
                   Padding(
                     padding: const EdgeInsets.only(right: 6),
                     child: _PillButton(
-                      label: lane.label,
+                      label: lane.name,
                       selected: _lane == lane,
                       onTap: () => setState(() => _lane = lane),
                     ),
@@ -267,7 +267,7 @@ class _PlanEditorState extends ConsumerState<_PlanEditor> {
                 if (_isEditing)
                   TextButton(
                     onPressed: _delete,
-                    child: const Text(
+                    child: Text(
                       '删除',
                       style: TextStyle(color: Palette.top),
                     ),
@@ -303,7 +303,7 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Text(text, style: const TextStyle(color: Palette.textDim, fontSize: 11));
+      Text(text, style: TextStyle(color: Palette.textDim, fontSize: 11));
 }
 
 class _DateField extends StatelessWidget {
@@ -333,12 +333,12 @@ class _DateField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(color: Palette.textDim, fontSize: 10),
+              style: TextStyle(color: Palette.textDim, fontSize: 10),
             ),
             const SizedBox(height: 2),
             Text(
               value,
-              style: const TextStyle(color: Palette.textPrimary, fontSize: 13),
+              style: TextStyle(color: Palette.textPrimary, fontSize: 13),
             ),
           ],
         ),
@@ -439,7 +439,7 @@ class _StepperField extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Palette.textDim, fontSize: 10),
+            style: TextStyle(color: Palette.textDim, fontSize: 10),
           ),
           Row(
             children: [
@@ -453,7 +453,7 @@ class _StepperField extends StatelessWidget {
                 child: Center(
                   child: Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Palette.textPrimary,
                       fontSize: 13,
                     ),

@@ -59,6 +59,52 @@ class DayBlockRepository {
     ];
   }
 
+  /// 全局搜索：标题或备注里包含 [query]，按日期倒序、同一天按开始时间。
+  ///
+  /// 只搜没被软删除的行；已完成 / 顺延的也搜得到（历史记录也要能找回来）。
+  Future<List<({String date, TBlock block})>> search(
+    String query, {
+    int limit = 80,
+  }) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final pattern = '%$q%';
+    final rows = await (_db.select(_db.dayBlocks)
+          ..where(
+            (t) =>
+                t.deletedAt.isNull() &
+                (t.title.like(pattern) | t.note.like(pattern)),
+          )
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
+            (t) => OrderingTerm(expression: t.startMin),
+          ])
+          ..limit(limit))
+        .get();
+    return [for (final row in rows) (date: row.date, block: _toBlock(row))];
+  }
+
+  /// 周视图用：一次取回区间内所有未完成方块，按日期分组。
+  Future<Map<String, List<TBlock>>> blocksInRange(
+    String startKey,
+    String endKey,
+  ) async {
+    final query = _db.select(_db.dayBlocks)
+      ..where(
+        (t) =>
+            t.date.isBetweenValues(startKey, endKey) &
+            t.deletedAt.isNull() &
+            t.status.equals(BlockStatus.planned.index),
+      )
+      ..orderBy([(t) => OrderingTerm(expression: t.startMin)]);
+    final rows = await query.get();
+    final grouped = <String, List<TBlock>>{};
+    for (final row in rows) {
+      grouped.putIfAbsent(row.date, () => <TBlock>[]).add(_toBlock(row));
+    }
+    return grouped;
+  }
+
   /// 日历月视图用：区间内每天还剩多少条（不含已完成的）
   Future<Map<String, int>> countByDateRange(
     String startKey,
@@ -143,7 +189,7 @@ class DayBlockRepository {
     return TBlock(
       id: r.id,
       title: r.title,
-      lane: Lane.byIndex(r.lane),
+      lane: Lane(id: r.lane, name: r.lane),
       startMin: r.startMin,
       durationMin: r.durationMin,
       priority:
@@ -167,7 +213,7 @@ class DayBlockRepository {
       id: Value(b.id),
       date: Value(date),
       title: Value(b.title),
-      lane: Value(b.lane.index),
+      lane: Value(b.lane.id),
       startMin: Value(b.startMin),
       durationMin: Value(b.durationMin),
       priority: Value(b.priority.index),

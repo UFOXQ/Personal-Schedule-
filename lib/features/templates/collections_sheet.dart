@@ -34,7 +34,7 @@ class _CollectionsSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '把集合整包投入今天',
                   style: TextStyle(
                     color: Palette.textPrimary,
@@ -43,7 +43,7 @@ class _CollectionsSheet extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   '集合是排好时段的重复任务，投进来就是一串方块',
                   style: TextStyle(color: Palette.textDim, fontSize: 11),
                 ),
@@ -56,7 +56,7 @@ class _CollectionsSheet extends ConsumerWidget {
                     ),
                   )
                 else if (collections.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Text(
                       '还没有集合。后面在模板页可以建（如「晚间收尾」）。',
@@ -72,7 +72,7 @@ class _CollectionsSheet extends ConsumerWidget {
                       shrinkWrap: true,
                       itemCount: collections.length,
                       separatorBuilder: (_, _) =>
-                          const Divider(height: 1, color: Palette.line),
+                          Divider(height: 1, color: Palette.line),
                       itemBuilder: (context, index) {
                         final collection = collections[index];
                         return _CollectionTile(collection: collection);
@@ -102,7 +102,7 @@ class _CollectionTile extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.inventory_2_outlined,
               color: Palette.accent,
               size: 18,
@@ -124,7 +124,7 @@ class _CollectionTile extends ConsumerWidget {
                     children: [
                       Text(
                         collection.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Palette.textPrimary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -137,7 +137,7 @@ class _CollectionTile extends ConsumerWidget {
                             : '${items.length} 个方块 · $preview',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Palette.textSecondary,
                           fontSize: 11,
                         ),
@@ -147,7 +147,7 @@ class _CollectionTile extends ConsumerWidget {
                 },
               ),
             ),
-            const Icon(
+            Icon(
               Icons.add_circle_outline,
               color: Palette.textDim,
               size: 20,
