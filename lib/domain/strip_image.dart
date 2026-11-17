@@ -40,6 +40,7 @@ class StripStyle {
     this.showLeft = true,
     this.showRight = true,
     this.lineRatio = 1.0,
+    this.light = false,
   });
 
   /// 文字整体缩放（0.8 ~ 1.4）
@@ -53,15 +54,46 @@ class StripStyle {
 
   /// 中间线路占可用宽度的比例（0.5 ~ 1.0）
   final double lineRatio;
+
+  /// 浅色外观（桌面小组件跟随系统时用）
+  final bool light;
 }
 
-const Color _bg = Color(0xFF151821);
-const Color _line = Color(0xFF2A3040);
 const Color _progress = Color(0xFF3D7BFF);
-const Color _textPrimary = Color(0xFFEAF0FF);
-const Color _textSecondary = Color(0xFF9AA3B8);
-const Color _textDim = Color(0xFF6B7488);
 const Color _accentNow = Color(0xFFFF3B30);
+
+/// 深色 / 浅色两套用色（小组件跟随系统）
+class _Tint {
+  const _Tint({
+    required this.bg,
+    required this.line,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textDim,
+  });
+
+  final Color bg;
+  final Color line;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textDim;
+
+  static const dark = _Tint(
+    bg: Color(0xFF151821),
+    line: Color(0xFF2A3040),
+    textPrimary: Color(0xFFEAF0FF),
+    textSecondary: Color(0xFF9AA3B8),
+    textDim: Color(0xFF6B7488),
+  );
+
+  static const light = _Tint(
+    bg: Color(0xFFF3F6FC),
+    line: Color(0xFFD7DDEA),
+    textPrimary: Color(0xFF0B1220),
+    textSecondary: Color(0xFF44506B),
+    textDim: Color(0xFF6E7891),
+  );
+}
 
 /// 画出时间条位图。[pixelRatio] 控制清晰度（原生侧按 dp 显示）
 Future<StripImage> renderStripImage(
@@ -116,6 +148,7 @@ Future<ui.Image> _renderStrip(
   required double pixelRatio,
   required StripStyle style,
 }) async {
+  final tint = style.light ? _Tint.light : _Tint.dark;
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
   final w = width * pixelRatio;
@@ -123,7 +156,7 @@ Future<ui.Image> _renderStrip(
   canvas.scale(pixelRatio);
 
   // 背景
-  final bgPaint = Paint()..color = _bg;
+  final bgPaint = Paint()..color = tint.bg;
   canvas.drawRRect(
     RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, width, height), const Radius.circular(14)),
     bgPaint,
@@ -156,12 +189,13 @@ Future<ui.Image> _renderStrip(
       unfinished,
       leftWidth,
       style.textScale,
+      tint,
     );
   }
   if (style.showRight) {
-    _paintRight(canvas, upcoming, width, rightWidth, style.textScale);
+    _paintRight(canvas, upcoming, width, rightWidth, style.textScale, tint);
   }
-  _paintLine(canvas, payload, midLeft, midRight, height);
+  _paintLine(canvas, payload, midLeft, midRight, height, tint);
 
   final picture = recorder.endRecording();
   final image = await picture.toImage(w.round(), h.round());
@@ -194,6 +228,7 @@ void _paintLeft(
   List<StripSegment> unfinished,
   double width,
   double textScale,
+  _Tint tint,
 ) {
   const padLeft = 12.0;
   final ty1 = 14 + (1 - textScale) * 6;
@@ -211,7 +246,7 @@ void _paintLeft(
     Offset(padLeft, ty1),
     maxWidth: textWidth,
     size: 10.5 * textScale,
-    color: unfinished.isEmpty ? _textDim : _accentNow.withValues(alpha: 0.9),
+    color: unfinished.isEmpty ? tint.textDim : _accentNow.withValues(alpha: 0.9),
   );
 
   // 主标题：现在做什么（真没有安排就写「现在空闲」）
@@ -223,7 +258,7 @@ void _paintLeft(
     maxWidth: textWidth,
     size: 17 * textScale,
     weight: FontWeight.w700,
-    color: _textPrimary,
+    color: tint.textPrimary,
   );
 
   // 时间：正在做就写它的区间，否则写下一件什么时候开始
@@ -234,7 +269,7 @@ void _paintLeft(
       Offset(padLeft, ty3),
       maxWidth: textWidth,
       size: 11 * textScale,
-      color: _textSecondary,
+      color: tint.textSecondary,
     );
   }
   if (current != null) {
@@ -244,7 +279,7 @@ void _paintLeft(
       Offset(padLeft, ty3),
       maxWidth: textWidth,
       size: 11 * textScale,
-      color: _textSecondary,
+      color: tint.textSecondary,
     );
   }
 }
@@ -255,6 +290,7 @@ void _paintRight(
   double width,
   double rightWidth,
   double textScale,
+  _Tint tint,
 ) {
   final left = width - rightWidth;
   const pad = 2.0;
@@ -269,7 +305,7 @@ void _paintRight(
     Offset(left, ry1),
     maxWidth: textWidth,
     size: 10.5 * textScale,
-    color: _textDim,
+    color: tint.textDim,
   );
   if (upcoming == null) {
     _text(
@@ -279,7 +315,7 @@ void _paintRight(
       maxWidth: textWidth,
       size: 14 * textScale,
       weight: FontWeight.w600,
-      color: _textSecondary,
+      color: tint.textSecondary,
     );
     return;
   }
@@ -290,7 +326,7 @@ void _paintRight(
     maxWidth: textWidth,
     size: 13 * textScale,
     weight: FontWeight.w600,
-    color: _textPrimary,
+    color: tint.textPrimary,
   );
   _text(
     canvas,
@@ -298,7 +334,7 @@ void _paintRight(
     Offset(left, ry3),
     maxWidth: textWidth,
     size: 11 * textScale,
-    color: _textSecondary,
+    color: tint.textSecondary,
   );
 }
 
@@ -309,13 +345,14 @@ void _paintLine(
   double left,
   double right,
   double height,
+  _Tint tint,
 ) {
   final y = height * 0.58;
   final width = right - left;
 
   // 底轨
   final track = Paint()
-    ..color = _line
+    ..color = tint.line
     ..strokeWidth = 7
     ..strokeCap = StrokeCap.round;
   canvas.drawLine(Offset(left, y), Offset(right, y), track);
@@ -363,7 +400,7 @@ void _paintLine(
   for (final segment in payload.segments) {
     final x = left + width * (segment.startMin / kMinutesPerDay).clamp(0.0, 1.0);
     final color = Color(segment.color);
-    canvas.drawCircle(Offset(x, y), 4.4, Paint()..color = _bg);
+    canvas.drawCircle(Offset(x, y), 4.4, Paint()..color = tint.bg);
     canvas.drawCircle(Offset(x, y), 3.4, Paint()..color = color);
     if (segment.isTop) {
       canvas.drawCircle(
@@ -405,7 +442,7 @@ void _text(
   Offset at, {
   required double maxWidth,
   double size = 12,
-  Color color = _textPrimary,
+  Color color = const Color(0xFFEAF0FF),
   FontWeight weight = FontWeight.w500,
 }) {
   final painter = TextPainter(

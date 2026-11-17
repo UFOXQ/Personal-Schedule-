@@ -20,6 +20,7 @@ import 'reminder_settings_sheet.dart';
 import 'sync_sheet.dart';
 import 'now_marker_picker.dart';
 import '../onboarding/onboarding_page.dart';
+import 'strip_preview.dart';
 import 'ui_prefs.dart';
 import 'ui_scale.dart';
 import 'ui_scale_sheet.dart';
@@ -188,6 +189,7 @@ class SettingsPage extends ConsumerWidget {
           _Section(
             title: '时间条样式',
             children: [
+              const StripPreview(),
               _StripSliderRow(
                 label: '文字大小',
                 hint: '时间条上的字整体放大或缩小',

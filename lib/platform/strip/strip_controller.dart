@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,7 +119,14 @@ class StripController extends Notifier<StripState> {
       _pushCount++;
       // 小组件写盘比较重，5 分钟刷一次就够；通知靠上面的实时推送
       if (_pushCount % 10 == 1) {
-        await _pushWidget(json, png);
+        final light =
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.light;
+        final widgetPng = await renderStripPng(
+          payload,
+          style: _style(light: light),
+        );
+        await _pushWidget(json, widgetPng);
       }
       return;
     }
@@ -139,9 +147,10 @@ class StripController extends Notifier<StripState> {
     });
   }
 
-  StripStyle _style() {
+  StripStyle _style({bool light = false}) {
     final prefs = ref.read(uiPrefsProvider);
     return StripStyle(
+      light: light,
       textScale: prefs.stripTextScale,
       showLeft: prefs.stripShowLeft,
       showRight: prefs.stripShowRight,

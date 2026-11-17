@@ -88,14 +88,14 @@ storeFile=<keystore 的绝对路径，例如 C:/keys/tnt-release.jks>
 
 ## 版本
 
-- 版本号在 `pubspec.yaml` 的 `version: 0.2.0+30`（语义版本 + versionCode）
+- 版本号在 `pubspec.yaml` 的 `version: 0.2.2+32`（语义版本 + versionCode）
 - 升级安装要求 versionCode 严格递增；从 debug 签名切到正式签名，因为签名不同，**必须先卸载旧包**再装。
 
 ## 开发方式
 
 - 需求来自日常使用中的真实痛点，按「先修手感 → 再做页面 → 最后打磨」的节奏迭代，每一轮都有可安装的包与截图。
 - 实现全程由 AI 编码代理在本地仓库完成：读代码 → 改代码 → `flutter analyze` / `flutter test` → 构建 APK 与 Windows 版 → 在模拟器与真实桌面上截图核对。
-- 关键的回归点都写成了测试（189 项），例如「只有选中才描边」「跨零点免打扰」「v2→v3 迁移可重入」「同步幂等」。
+- 关键的回归点都写成了测试（192 项），例如「只有选中才描边」「跨零点免打扰」「v2→v3 迁移可重入」「同步幂等」。
 - 发布流程：`tool/build.ps1` 一键出包 → GitHub Actions 在打 tag 时校验并打包 → Release 附产物。
 
 ## 已知限制

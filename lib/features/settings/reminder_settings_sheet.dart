@@ -10,6 +10,7 @@ import 'reminder_settings.dart';
 Future<void> showReminderSettingsSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
     backgroundColor: Palette.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -76,11 +77,22 @@ class _ReminderSettingsSheetState
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          14,
+          16,
+          12 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
             Text(
               '到点提醒',
               style: TextStyle(
@@ -222,6 +234,10 @@ class _ReminderSettingsSheetState
                   ),
                 ),
               ],
+            ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             Row(
