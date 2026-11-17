@@ -2,6 +2,8 @@
 
 把「今天要做什么」画成一条**可拖的纵向时间轴**：三层泳道（日常 / 打卡 / 临时）、方块就是事件、拖一下就改时间。Android + Windows 双端，数据可以在同一 Wi-Fi 下直接同步。
 
+> 本项目从需求梳理、界面原型、数据层到发布流水线，主要在与 **DeepSeek Harness (DSH)** 的 AI 编码代理协作下完成；每一处改动都在真实设备（Pixel 模拟器 / Windows）上构建、截图、跑测试验证。
+
 TNT turns your day into a drag-and-drop timeline: three swimlanes, one block per event, reminders, a live "metro map" status strip on phone and desktop, and LAN sync between your own devices. UI is Chinese; the code and docs are bilingual-friendly.
 
 ## 截图
@@ -69,21 +71,30 @@ pwsh -File tool/build.ps1 -SkipTest  # 跳过测试
 
 ## 正式签名
 
-`android/key.properties`（已在 `.gitignore` 里）指向 keystore：
+发布版需要自己的 keystore。新建 `android/key.properties`（已在 `.gitignore` 里，别提交）：
 
 ```properties
-storePassword=***
-keyPassword=***
-keyAlias=tnt
-storeFile=E:/TNT/keystore/tnt-release.jks
+storePassword=<keystore 口令>
+keyPassword=<key 口令>
+keyAlias=<别名>
+storeFile=<keystore 的绝对路径，例如 C:/keys/tnt-release.jks>
 ```
 
-文件不存在时自动退回 debug 签名（`flutter run` 照常可用）。发布前请换成你自己的 keystore —— **keystore 丢了就再也升不了级**。
+- 这个文件**不存在**时自动退回 debug 签名，`flutter run` 与本地调试照常可用。
+- 换个签名要先用旧 keystore 生成过包，否则新旧包不能覆盖安装（签名不同系统会拒绝）。
+- **keystore 和两个口令务必备份**，丢了就只能改包名重新发布，老用户升不上来。
 
 ## 版本
 
 - 版本号在 `pubspec.yaml` 的 `version: 0.2.0+30`（语义版本 + versionCode）
-- 升级安装的 versionCode 必须大于已装版本；从 debug 签名换正式签名需要先卸载旧包
+- 升级安装要求 versionCode 严格递增；从 debug 签名切到正式签名，因为签名不同，**必须先卸载旧包**再装。
+
+## 开发方式
+
+- 需求来自日常使用中的真实痛点，按「先修手感 → 再做页面 → 最后打磨」的节奏迭代，每一轮都有可安装的包与截图。
+- 实现全程由 AI 编码代理在本地仓库完成：读代码 → 改代码 → `flutter analyze` / `flutter test` → 构建 APK 与 Windows 版 → 在模拟器与真实桌面上截图核对。
+- 关键的回归点都写成了测试（189 项），例如「只有选中才描边」「跨零点免打扰」「v2→v3 迁移可重入」「同步幂等」。
+- 发布流程：`tool/build.ps1` 一键出包 → GitHub Actions 在打 tag 时校验并打包 → Release 附产物。
 
 ## 已知限制
 
