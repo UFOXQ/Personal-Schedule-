@@ -14,7 +14,7 @@ TNT turns your day into a drag-and-drop timeline: three swimlanes, one block per
 
 | 手机通知栏的时间条 | 4×1 桌面小组件 |
 | --- | --- |
-| ![notification](docs/images/notification.png) | ![widget](docs/images/widget.png) |
+| ![notification](docs/images/notification.png) | ![widget](docs/images/widget.jpg) |
 
 ## 现在能做什么
 
