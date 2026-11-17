@@ -6,9 +6,15 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze-test:
-    runs-on: ubuntu-latest
+    # 项目只面向 Android + Windows，依赖里 tray_manager 的原生代码在 Linux 上要 GTK/X11 头文件，
+    # 直接跑在 windows-latest 上既贴合目标平台，也省掉一堆 apt 依赖。
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -18,12 +24,12 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter analyze
-      - run: flutter test
+      - run: flutter test --reporter expanded
 
   build-apk:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: analyze-test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -37,14 +43,19 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Restore keystore
+        shell: pwsh
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/tnt-release.jks
-          cat > android/key.properties <<EOF
+          if (-not "${{ secrets.KEYSTORE_BASE64 }}") {
+            Write-Host "KEYSTORE_BASE64 未配置，跳过签名，产物为 debug 签名"
+            exit 0
+          }
+          [IO.File]::WriteAllBytes("android/app/tnt-release.jks", [Convert]::FromBase64String("${{ secrets.KEYSTORE_BASE64 }}"))
+          @"
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=tnt-release.jks
-          EOF
+          "@ | Set-Content -Encoding ascii android/key.properties
       - run: flutter build apk --release --split-per-abi
       - uses: actions/upload-artifact@v4
         with:
