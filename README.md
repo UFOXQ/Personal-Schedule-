@@ -4,6 +4,16 @@
 
 TNT turns your day into a drag-and-drop timeline: three swimlanes, one block per event, reminders, a live "metro map" status strip on phone and desktop, and LAN sync between your own devices. UI is Chinese; the code and docs are bilingual-friendly.
 
+## 截图
+
+| 时间轴（深色） | 时间轴（浅色） |
+| --- | --- |
+| ![timeline dark](docs/images/timeline-dark.png) | ![timeline light](docs/images/timeline-light.png) |
+
+| 手机通知栏的时间条 | 4×1 桌面小组件 |
+| --- | --- |
+| ![notification](docs/images/notification.png) | ![widget](docs/images/widget.png) |
+
 ## 现在能做什么
 
 | 模块 | 能力 |
