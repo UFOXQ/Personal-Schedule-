@@ -5,6 +5,8 @@ import 'package:tnt_app/data/db/tnt_database.dart';
 import 'package:tnt_app/data/providers.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 200; i++) {
     if (!container.read(timelineProvider).loading) return;
@@ -24,6 +26,7 @@ void main() {
     );
     container.read(timelineProvider.notifier);
     await settle(container);
+    await seedTimeline(container);
   });
 
   tearDown(() async {

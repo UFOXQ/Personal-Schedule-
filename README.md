@@ -16,6 +16,8 @@ TNT turns your day into a drag-and-drop timeline: three swimlanes, one block per
 | --- | --- |
 | ![notification](docs/images/notification.png) | ![widget](docs/images/widget.jpg) |
 
+> 首次打开是**空白**的：不会预置任何示例数据，直接长按空白处新建第一个方块，或先到「库」里建一个合集。
+
 ## 现在能做什么
 
 | 模块 | 能力 |

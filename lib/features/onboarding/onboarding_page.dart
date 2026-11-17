@@ -55,6 +55,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
       icon: Icons.pan_tool_alt_outlined,
     ),
     _Slide(
+      title: '整块搬：合集与长期计划',
+      body: '底部「库」里把常一起做的事捆成合集（早间流程、晚间收尾），点一下整套投到某天；'
+          '长期计划（每天/工作日/周几 的固定安排）会自动出现在对应日子的时间轴上。',
+      icon: Icons.library_add_outlined,
+    ),
+    _Slide(
       title: '不改也能用：提醒 + 时间条',
       body: '设置里打开「到点提醒」，方块开始前会弹通知；'
           '再开「常驻时间条」，通知栏和桌面小组件里会有一条今天的线路图，红线跟着时间走。',
@@ -257,6 +263,8 @@ class _ThumbPainter extends CustomPainter {
       case 1:
         _drag(canvas, size);
       case 2:
+        _library(canvas, size);
+      case 3:
         _strip(canvas, size);
       default:
         _lock(canvas, size);
@@ -376,6 +384,119 @@ class _ThumbPainter extends CustomPainter {
         final next = (distance + 5).clamp(0.0, metric.length);
         canvas.drawPath(metric.extractPath(distance, next), paint);
         distance = next + 4;
+      }
+    }
+  }
+
+  /// 合集（左上两张卡）→ 拖/点 → 落到今天的时间轴（右下）
+  void _library(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cardW = w * 0.40;
+    final cardH = h * 0.26;
+
+    void card(double top, String label, double count) {
+      final rect = Rect.fromLTWH(14, top, cardW, cardH);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(10)),
+        Paint()..color = Palette.surface,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(10)),
+        Paint()
+          ..color = Palette.line
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+      // 左侧色条
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rect.left + 8, rect.top + 8, 4, cardH - 16),
+          const Radius.circular(2),
+        ),
+        Paint()..color = Palette.accent.withValues(alpha: 0.8),
+      );
+      // 标题与条数用色块示意（不画字，保持和其它页一致）
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rect.left + 18, rect.top + 10, cardW * 0.45, 8),
+          const Radius.circular(4),
+        ),
+        Paint()..color = Palette.textSecondary.withValues(alpha: 0.55),
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rect.left + 18, rect.top + 24, cardW * 0.25, 6),
+          const Radius.circular(3),
+        ),
+        Paint()..color = Palette.textDim.withValues(alpha: 0.5),
+      );
+      // 右下角「投入」小胶囊
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rect.right - 46, rect.bottom - 20, 38, 12),
+          const Radius.circular(6),
+        ),
+        Paint()..color = Palette.accent.withValues(alpha: 0.28),
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rect.right - 44, rect.bottom - 18, count, 8),
+          const Radius.circular(4),
+        ),
+        Paint()..color = Palette.accent,
+      );
+    }
+
+    card(14, 'a', 10);
+    card(14 + cardH + 10, 'b', 14);
+
+    // 中间箭头
+    final arrow = Paint()
+      ..color = Palette.accent
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final x0 = 14 + cardW + 10;
+    final y0 = h * 0.5;
+    canvas.drawLine(Offset(x0, y0), Offset(x0 + 18, y0), arrow);
+    canvas.drawLine(
+      Offset(x0 + 18, y0),
+      Offset(x0 + 12, y0 - 5),
+      arrow,
+    );
+    canvas.drawLine(
+      Offset(x0 + 18, y0),
+      Offset(x0 + 12, y0 + 5),
+      arrow,
+    );
+
+    // 右边：今天的时间轴（两根泳道 + 三个块）
+    final laneX = x0 + 26;
+    final laneW = w - laneX - 14;
+    for (var i = 0; i < 2; i++) {
+      final rect = Rect.fromLTWH(
+        laneX,
+        16 + i * (h * 0.42 + 8),
+        laneW,
+        h * 0.42,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(9)),
+        Paint()..color = Palette.surface,
+      );
+      for (var j = 0; j < 2; j++) {
+        final block = Rect.fromLTWH(
+          rect.left + 8,
+          rect.top + 10 + j * 26,
+          (laneW - 16) * 0.8,
+          18,
+        );
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(block, const Radius.circular(6)),
+          Paint()
+            ..color = (i == 0 ? Palette.accent : Palette.of(Priority.b))
+                .withValues(alpha: 0.5),
+        );
       }
     }
   }

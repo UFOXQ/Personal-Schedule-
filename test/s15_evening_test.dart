@@ -8,6 +8,8 @@ import 'package:tnt_app/data/providers.dart';
 import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 40; i++) {
     await Future<void>.delayed(const Duration(milliseconds: 30));
@@ -29,6 +31,7 @@ void main() {
     addTearDown(db.close);
 
     await settle(container);
+    await seedTimeline(container);
     final notifier = container.read(timelineProvider.notifier);
     final state = container.read(timelineProvider);
     final today = state.dateKey;

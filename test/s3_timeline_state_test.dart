@@ -7,6 +7,8 @@ import 'package:tnt_app/data/repositories/day_block_repository.dart';
 import 'package:tnt_app/data/repositories/library_repository.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 /// 状态层的行为验证（不起 UI）：完成、集合投入、幂等。
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 200; i++) {
@@ -31,6 +33,7 @@ void main() {
     );
     container.read(timelineProvider.notifier);
     await settle(container);
+    await seedTimeline(container);
   });
 
   tearDown(() async {
@@ -38,16 +41,11 @@ void main() {
     await db.close();
   });
 
-  test('首次启动会灌示例数据，并且长期计划当天被物化了一份', () async {
+  test('首次启动不再灌示例数据（示例库 id 一律不出现）', () async {
     final state = container.read(timelineProvider);
-    expect(state.blocks, isNotEmpty);
-    // 学英语来自「计划」物化，不是手写 seed
-    final english = state.blocks.where((b) => b.title == '学英语').toList();
-    expect(english, hasLength(1));
-    expect(english.single.carryCount, 0);
-
+    expect(state.blocks.any((b) => b.id.startsWith('seed-')), isFalse);
     final plans = await libRepo.plans();
-    expect(plans.map((p) => p.title), contains('学英语'));
+    expect(plans, isEmpty);
   });
 
   test('完成选中方块：当天列表少一条，完成记录多一条', () async {
@@ -102,6 +100,7 @@ void main() {
 
     final after = await dayRepo.loadDay(todayKey);
     expect(after.length, before.length);
-    expect(after.where((b) => b.title == '学英语'), hasLength(1));
+    // 没有任何计划时不应凭空多出方块
+    expect(after.where((b) => b.id.startsWith('plan:')), isEmpty);
   });
 }

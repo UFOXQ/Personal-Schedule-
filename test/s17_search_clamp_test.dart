@@ -8,6 +8,8 @@ import 'package:tnt_app/data/repositories/day_block_repository.dart';
 import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 /// 全局搜索 + 「方块不许越过 24:00」的夹紧逻辑。
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 200; i++) {
@@ -44,6 +46,7 @@ void main() {
       );
       container.read(timelineProvider.notifier);
       await settle(container);
+    await seedTimeline(container);
       repo = DayBlockRepository(db);
     });
 

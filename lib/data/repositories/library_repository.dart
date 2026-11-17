@@ -29,6 +29,24 @@ class LibraryRepository {
   static const _uuid = Uuid();
 
   // ── 模板 ────────────────────────────────────────────────────
+  /// 一次性清理老版本灌进库里的示例数据（id 都以 seed- 开头）。
+  /// 只动 seed 前缀的行，绝不会碰用户自己建的内容；重复调用安全。
+  Future<void> purgeDemoData() async {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    await _db.customStatement(
+      "UPDATE day_blocks SET deleted_at = ? WHERE deleted_at IS NULL "
+      "AND (id LIKE 'seed-%' OR id LIKE 'plan:seed-%')",
+      [now],
+    );
+    await _db.customStatement(
+      "DELETE FROM collection_items WHERE collection_id LIKE 'seed-coll-%'",
+    );
+    await _db.customStatement(
+      "DELETE FROM collections WHERE id LIKE 'seed-coll-%'",
+    );
+    await _db.customStatement("DELETE FROM plans WHERE id LIKE 'seed-%'");
+  }
+
   Future<List<BlockTemplate>> templates() {
     final q = _db.select(_db.blockTemplates)
       ..where((t) => t.deletedAt.isNull())

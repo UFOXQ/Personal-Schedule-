@@ -135,6 +135,8 @@ class TimelineNotifier extends Notifier<TimelineState> {
   late final LibraryRepository _library;
   late final LaneRepository _lanes;
   bool _disposed = false;
+  /// 每个 Notifier 实例（≈每次启动）只清一次老样例。
+  bool _demoPurged = false;
   Timer? _reminderDebounce;
 
   @override
@@ -172,17 +174,14 @@ class TimelineNotifier extends Notifier<TimelineState> {
   /// 4. 找出以前没做完的方块，交给 UI 弹顺延窗
   Future<void> _load(String key) async {
     try {
+      if (!_demoPurged) {
+        _demoPurged = true;
+        await _library.purgeDemoData();
+      }
       final lanes = await _lanes.all();
       if (_disposed) return;
       state = state.copyWith(lanes: lanes);
-      final total = await _repo.countAll();
       var blocks = await _repo.loadDay(key);
-
-      if (total == 0) {
-        await _seedLibrary();
-        blocks = _seed(DateTime.now());
-        await _repo.upsertAll(blocks, key);
-      }
 
       blocks = [...blocks, ...await _materializePlans(key, blocks)];
 
@@ -205,7 +204,7 @@ class TimelineNotifier extends Notifier<TimelineState> {
     } catch (error, stack) {
       // 数据库打不开也不能白屏：退回内存模式，至少能用
       if (_disposed) return;
-      state = state.copyWith(blocks: _seed(DateTime.now()), loading: false);
+      state = state.copyWith(blocks: const <TBlock>[], loading: false);
       // ignore: avoid_print
       print('TNT: 读取数据库失败，已退回内存模式 -> $error\n$stack');
     }
@@ -927,139 +926,6 @@ class TimelineNotifier extends Notifier<TimelineState> {
     };
   }
 
-  // ── 示例数据 ───────────────────────────────────────────────
-  /// 第一次启动时给两个集合和一个长期计划，让 S3 的功能一进来就能看见
-  Future<void> _seedLibrary() async {
-    if ((await _library.collections()).isNotEmpty) return;
-    await _library.createCollectionSimple(
-      name: '早间流程',
-      id: 'seed-coll-morning',
-      itemIdPrefix: 'seed-coll-morning-item',
-      items: const [
-        CollectionSeedItem(
-          title: '喂猫',
-          lane: Lane.daily,
-          startMin: 430,
-          durationMin: 15,
-          priority: Priority.d,
-        ),
-        CollectionSeedItem(
-          title: '早餐',
-          lane: Lane.daily,
-          startMin: 460,
-          durationMin: 30,
-        ),
-      ],
-    );
-    await _library.createCollectionSimple(
-      name: '晚间收尾',
-      id: 'seed-coll-evening',
-      itemIdPrefix: 'seed-coll-evening-item',
-      items: const [
-        CollectionSeedItem(
-          title: '晚饭',
-          lane: Lane.daily,
-          startMin: 1110,
-          durationMin: 45,
-        ),
-        CollectionSeedItem(
-          title: '洗澡',
-          lane: Lane.daily,
-          startMin: 1290,
-          durationMin: 25,
-          priority: Priority.d,
-        ),
-        CollectionSeedItem(
-          title: '复盘日记',
-          lane: Lane.habit,
-          startMin: 1230,
-          durationMin: 20,
-        ),
-      ],
-    );
-
-    if ((await _library.plans()).isNotEmpty) return;
-    final today = DateTime.now();
-    await _library.createPlanSimple(
-      id: 'seed-plan-english',
-      title: '学英语',
-      startDate: formatDateKey(today.subtract(const Duration(days: 30))),
-      endDate: formatDateKey(today.add(const Duration(days: 60))),
-      lane: Lane.habit,
-      startMin: 540,
-      durationMin: 60,
-      priority: Priority.b,
-    );
-  }
-
-  TBlock _block(
-    String title,
-    Lane lane,
-    int hour,
-    int minute,
-    int duration,
-    Priority priority, {
-    String? id,
-    Duration? deadline,
-    DateTime? now,
-  }) {
-    return TBlock(
-      id: id ?? _uuid.v4(),
-      title: title,
-      lane: lane,
-      startMin: hour * 60 + minute,
-      durationMin: duration,
-      priority: priority,
-      // deadline 用「相对现在还有多久」描述，落库时再换成绝对时间
-      deadline: deadline == null ? null : (now ?? DateTime.now()).add(deadline),
-    );
-  }
-
-  /// 示例当天排班。`学英语` 故意不放这里——它由长期计划物化生成，
-  /// 用来验证「计划 → 当天方块」这条链路。
-  List<TBlock> _seed(DateTime now) {
-    return [
-      // ① 日常琐事
-      _block('喂猫', Lane.daily, 7, 10, 15, Priority.d, id: 'seed-cat'),
-      _block('早餐', Lane.daily, 7, 40, 30, Priority.c, id: 'seed-breakfast'),
-      _block('洗衣服', Lane.daily, 12, 0, 40, Priority.d, id: 'seed-laundry'),
-      _block('午饭', Lane.daily, 12, 40, 45, Priority.c, id: 'seed-lunch'),
-      _block('晚饭', Lane.daily, 18, 30, 45, Priority.c, id: 'seed-dinner'),
-      _block('洗澡', Lane.daily, 21, 30, 25, Priority.d, id: 'seed-shower'),
-
-      // ② 长期任务打卡（含一处重叠：阅读 vs 线上会议）
-      _block('阅读', Lane.habit, 14, 0, 60, Priority.c, id: 'seed-reading'),
-      _block('线上会议', Lane.habit, 14, 20, 45, Priority.c, id: 'seed-meeting'),
-      _block('健身', Lane.habit, 16, 30, 60, Priority.d, id: 'seed-gym'),
-      _block('复盘日记', Lane.habit, 20, 30, 20, Priority.c, id: 'seed-review'),
-      _block('冥想', Lane.habit, 22, 30, 15, Priority.d, id: 'seed-meditate'),
-
-      // ③ 平时没有、A 级或临近死线才出现的临时事件
-      _block('交周报', Lane.temp, 10, 30, 60, Priority.a, id: 'seed-weekly'),
-      _block(
-        '回复邮件',
-        Lane.temp,
-        10,
-        45,
-        30,
-        Priority.b,
-        id: 'seed-email',
-        deadline: const Duration(hours: 30),
-        now: now,
-      ),
-      _block(
-        '修登录 bug',
-        Lane.temp,
-        15,
-        30,
-        45,
-        Priority.b,
-        id: 'seed-bug',
-        deadline: const Duration(hours: 20),
-        now: now,
-      ),
-    ];
-  }
 }
 
 final timelineProvider = NotifierProvider<TimelineNotifier, TimelineState>(

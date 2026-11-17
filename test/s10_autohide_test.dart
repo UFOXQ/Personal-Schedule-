@@ -34,6 +34,9 @@ void main() {
 
   test('自动收起空泳道：只收起当天没有方块的泳道', () async {
     final notifier = container.read(timelineProvider.notifier);
+    // 新版不再自动灌示例数据，自己放一个方块
+    notifier.addBlockAt(lane: Lane.daily, startMin: 10 * 60);
+    await Future<void>.delayed(const Duration(milliseconds: 40));
     var state = container.read(timelineProvider);
     final used = {for (final block in state.blocks) block.lane};
     expect(used, isNotEmpty);

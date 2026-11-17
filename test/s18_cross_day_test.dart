@@ -9,6 +9,8 @@ import 'package:tnt_app/domain/models/day_jump.dart';
 import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 /// 跨天拖拽（moveToDate）+ 周视图色块跳时刻要用到的领域数据。
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 200; i++) {
@@ -52,6 +54,7 @@ void main() {
       );
       container.read(timelineProvider.notifier);
       await settle(container);
+    await seedTimeline(container);
       repo = DayBlockRepository(db);
     });
 

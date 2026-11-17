@@ -6,6 +6,8 @@ import 'package:tnt_app/data/providers.dart';
 import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 /// P0 交互改造的状态层验证：锁定守卫、编辑字段语义、顺延/复制。
 Future<void> settle(ProviderContainer container) async {
   for (var i = 0; i < 200; i++) {
@@ -26,6 +28,7 @@ void main() {
     );
     container.read(timelineProvider.notifier);
     await settle(container);
+    await seedTimeline(container);
   });
 
   tearDown(() async {

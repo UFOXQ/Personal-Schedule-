@@ -23,6 +23,10 @@ void main() {
 
     await tester.tap(find.text('下一步'));
     await tester.pumpAndSettle();
+    expect(find.text('整块搬：合集与长期计划'), findsOneWidget);
+
+    await tester.tap(find.text('下一步'));
+    await tester.pumpAndSettle();
     expect(find.text('不改也能用：提醒 + 时间条'), findsOneWidget);
 
     await tester.tap(find.text('下一步'));

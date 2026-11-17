@@ -6,6 +6,8 @@ import 'package:tnt_app/data/providers.dart';
 import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
 
+import 'support/seed_helper.dart';
+
 Future<TntDatabase> _emptyDb() async {
   final db = TntDatabase.forTesting(NativeDatabase.memory());
   return db;
@@ -27,6 +29,7 @@ void main() {
     addTearDown(container.dispose);
     addTearDown(db.close);
     await _settle(container);
+    await seedTimeline(container);
 
     final notifier = container.read(timelineProvider.notifier);
     final before = container.read(timelineProvider).blocks;
@@ -57,6 +60,7 @@ void main() {
     addTearDown(container.dispose);
     addTearDown(db.close);
     await _settle(container);
+    await seedTimeline(container);
 
     final notifier = container.read(timelineProvider.notifier);
     notifier.toggleLock();
@@ -77,6 +81,7 @@ void main() {
     addTearDown(container.dispose);
     addTearDown(db.close);
     await _settle(container);
+    await seedTimeline(container);
 
     final notifier = container.read(timelineProvider.notifier);
     final target = container.read(timelineProvider).blocks.first;

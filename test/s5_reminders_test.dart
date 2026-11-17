@@ -10,6 +10,8 @@ import 'package:tnt_app/domain/models/tblock.dart';
 import 'package:tnt_app/domain/reminders.dart';
 import 'package:tnt_app/features/settings/reminder_settings.dart';
 import 'package:tnt_app/features/timeline/timeline_state.dart';
+
+import 'support/seed_helper.dart';
 import 'package:tnt_app/platform/notifications/reminder_scheduler.dart';
 
 /// 假的调度器：只记录被排了哪些提醒。
@@ -229,6 +231,7 @@ void main() {
       );
       container.read(timelineProvider.notifier);
       await settle(container);
+    await seedTimeline(container);
       await settleReminders();
     });
 
